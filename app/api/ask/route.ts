@@ -4,6 +4,7 @@ import { analyse, type Answer } from "@/lib/mooneto/classify"
 import { standalone } from "@/lib/mooneto/rewrite"
 import { read, write } from "@/lib/mooneto/cache"
 import { buildPlan, wantsPlan } from "@/lib/mooneto/plan"
+import { corpus } from "@/lib/mooneto/laws"
 
 export const runtime = "nodejs"
 export const maxDuration = 120
@@ -37,7 +38,12 @@ export async function POST(request: Request) {
       found.laws = [...new Set([...found.laws, ...against.laws])]
     }
 
-    const analysed = await analyse(found)
+    // The legal corpus: the articulated provisions of every instrument Cala named.
+    // Claims are judged against this and nothing else.
+    const provisions = await corpus(found.laws)
+    console.log(`[mooneto] corpus: ${provisions.length} provision(s) from ${found.laws.length} law(s)`)
+
+    const analysed = await analyse(found, provisions)
     // A request for a decision gets a memo, not a claim list.
     // Fold in everything established earlier in the thread, so the memo reasons over the
     // whole case file rather than only the last question's findings.

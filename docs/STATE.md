@@ -21,6 +21,17 @@ Red verdict, 5 settled claims with real source links, 2 treaty cards, US flag.
 **Beat 2** ("But can I keep the resources I extract there?") — verified. Green verdict,
 5 treaty cards, flags split across enables / rejects / unclear.
 
+## Evidence is now restricted to legal instruments
+
+`lib/mooneto/laws.ts` pulls the articulated provisions of every Law entity Cala names, and
+a claim may only be labelled `settled` or `disputed` if it cites one — enforced in code.
+Scholarly commentary and blog-sourced statements fall to `unsupported`, which is the
+correct and intended behaviour.
+
+**Known limitation:** the corpus covers only the instruments a given query named. Always
+loading the six core treaties was tried and reverted — it trips Cala's rate limit and
+collapses every claim to unsupported. See ROADMAP item 0 for the fix.
+
 ## Open work, in priority order
 
 ### ~~1. Beat 3~~ — DONE

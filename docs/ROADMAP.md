@@ -5,22 +5,57 @@ without this conversation. Read `docs/STATE.md` first for what already works.
 
 ---
 
-## 1. Sharpen the business-case memo  ·  **do first**
+## 0. Finish the legal corpus  ·  **do this first**
 
-**Status:** working, but the verdict names a treaty instead of a country.
+### What was just built
 
-Beat 3 now returns a real memo (`plan` in the API response) with `route`, `risks` and
-`confidence`. The prompt in `lib/mooneto/plan.ts` was just tightened to force the verdict
-to name a *state* to incorporate in. **Re-test and confirm it now names a country.**
+Claims are no longer judged against Cala's prose. `lib/mooneto/laws.ts` looks up each
+`Law` entity Cala names and pulls its `key_provisions` — the articulated rule — and
+`lib/mooneto/classify.ts` may only label a claim `settled` or `disputed` if it cites one
+of those provisions. **The rule is enforced in code, not in the prompt:** if the model
+returns no provision index, the claim is forced to `unsupported`.
 
-```bash
-rm -rf .cache && bash scripts/warm.sh
-```
+The product principle behind it, in the user's words: *"from Cala we take only what is
+reliable and jurisdictional. A lawyer relies on that, not on what a blog says."*
 
-> **Codex brief:** In `lib/mooneto/plan.ts`, verify the memo verdict names an actual
-> country to incorporate in (Luxembourg, United States…), never a treaty. If it still
-> names instruments, tighten the system prompt further. Test with
-> "Build me the business case for a lunar mining company".
+Verified working: "Can I own a plot of land on the Moon?" returns 4 settled claims, each
+citing Outer Space Treaty Article II or the Artemis Accords, and 8 unsupported — including
+the scholarly opinions, which are commentary and not authority. That is correct behaviour.
+
+### The limitation, and the attempt that failed
+
+The corpus is built only from the instruments **that particular query happened to name**.
+So a claim about the Moon Agreement comes back `unsupported` whenever the query did not
+surface that entity, even though the Moon Agreement is squarely relevant.
+
+The obvious fix — always load the six core instruments — **was tried and reverted**.
+Six laws × two Cala calls each, issued per request, trips Cala's rate limit (HTTP 429).
+`corpus()` then returns empty, and because the code rule requires a citation, **every
+claim collapses to `unsupported`**. All 12 went grey. The constant survives in
+`laws.ts` as `CORE`, exported but deliberately not wired in.
+
+> **Codex brief:** The corpus must not be fetched at request time. Write
+> `scripts/corpus.ts` that looks up the six instruments in `CORE` (exported from
+> `lib/mooneto/laws.ts`) **once**, sequentially, with a delay between calls to respect
+> Cala's rate limit, and writes the result to `data/corpus.json`, committed to the repo.
+> Then change `corpus()` in `laws.ts` to read that file and merge in any additional law
+> the query names (still cached). Verify with "Can I own a plot of land on the Moon?"
+> that claims about the Moon Agreement now cite it instead of coming back unsupported,
+> and that the settled count does **not** drop to zero. If it drops to zero, the corpus
+> failed to load — do not ship that.
+
+## 1. Show the provision instead of the blog link  ·  **highest visible value**
+
+Claims now carry a `provision` object (`law`, `year`, `text`), but `app/page.tsx` still
+renders the old `sources` links, which point at blogs like `newspaceeconomy.ca`. The whole
+point of item 0 is undone if the UI keeps showing the blog.
+
+> **Codex brief:** In `app/page.tsx`, when a claim has a `provision`, render the provision
+> as its evidence — law name, year, and the articulated text — styled distinctly from the
+> claim itself. Remove the blog `sources` links from the claim view entirely; they are
+> secondary commentary and must not appear as authority. Unsupported claims show no
+> evidence and should read as visibly weaker. Use the tokens already in
+> `app/globals.css`; do not add a CSS framework.
 
 ## 2. Render the memo in the UI  ·  **required for the demo**
 
