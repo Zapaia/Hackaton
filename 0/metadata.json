@@ -1,0 +1,88 @@
+{
+  "cli_version": "0.10.3",
+  "checkpoint_id": "01M16R5991FV93M0PZT0DM2DMF",
+  "session_id": "01a04d43-f8a4-7881-9a06-3e7d9924dc7d",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-29T12:33:23.271059Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 3,
+  "files_touched": [
+    "app/globals.css",
+    "app/page.tsx"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-terra",
+  "turn_id": "e84b904d9b1d",
+  "checkpoint_transcript_start": 408,
+  "transcript_lines_at_start": 408,
+  "compact_transcript_start": 65,
+  "token_usage": {
+    "input_tokens": 47866,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3165568,
+    "output_tokens": 12642,
+    "api_call_count": 29
+  },
+  "session_metrics": {
+    "turn_count": 12
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-08-29T12:33:23.215136Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 65,
+    "human_modified": 2,
+    "human_removed": 0,
+    "total_committed": 65,
+    "total_lines_changed": 67,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 47,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "lib/mooneto/fal.ts": 21,
+        "scripts/lunar-mining-loop.ts": 26
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 47,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 47,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 64,
+      "user_lines_removed": 9,
+      "agent_lines_added": 47,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "app/globals.css": 2,
+        "app/page.tsx": 21,
+        "lib/mooneto/fal.ts": 17,
+        "public/illustrations/.lunar-mining-loop-job.json": 3,
+        "scripts/lunar-mining-loop.ts": 21
+      },
+      "user_removed_per_file": {
+        "app/page.tsx": 1,
+        "lib/mooneto/fal.ts": 4,
+        "scripts/lunar-mining-loop.ts": 4
+      }
+    }
+  ]
+}
