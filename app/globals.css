@@ -237,16 +237,87 @@ h1, h2, h3 { font-weight: 600; line-height: 1.18; text-wrap: balance; }
   font-size: var(--step-2);
 }
 
-.pulse {
+.scene-pending { position: relative; flex-direction: column; overflow: hidden; }
+
+/* The wait is the agent's route: it flies from the Moon out to each instrument and back.
+   When the generated scene lands it takes this exact frame, so nothing shifts. */
+.constellation { position: absolute; inset: 0; }
+
+.field-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.35;
+  animation: twinkle 2.8s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.6; }
+}
+
+.route { position: absolute; inset: 0; width: 100%; height: 100%; }
+.route path {
+  fill: none;
+  stroke: var(--moon);
+  stroke-width: 0.35;
+  stroke-dasharray: 1.4 2.6;
+  opacity: 0.3;
+  vector-effect: non-scaling-stroke;
+}
+
+.instrument-star {
+  position: absolute;
   width: 7px;
   height: 7px;
+  margin: -3.5px 0 0 -3.5px;
   border-radius: 50%;
-  background: var(--moon);
-  animation: breathe 1.6s ease-in-out infinite;
+  background: var(--rule-strong);
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-@keyframes breathe {
-  0%, 100% { opacity: 0.25; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1); }
+.instrument-star.reached {
+  background: var(--moon);
+  box-shadow: 0 0 0 3px rgba(230, 200, 138, 0.16);
+}
+
+.scout {
+  position: absolute;
+  color: var(--moon);
+  margin: -10px 0 0 -10px;
+  transition: left 0.85s var(--ease), top 0.85s var(--ease);
+}
+.rocket-mark { width: 20px; height: 20px; display: block; }
+
+.moon-body {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #d6dae4, #9aa1b4 52%, #4d5366 100%);
+  box-shadow: 0 0 44px rgba(180, 195, 235, 0.14);
+}
+.crater {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(70, 76, 95, 0.55);
+}
+
+.scene-note {
+  position: absolute;
+  left: 50%;
+  bottom: 0.85rem;
+  transform: translateX(-50%);
+  color: var(--ink-faint);
+  font-size: var(--step-1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-star { animation: none; opacity: 0.35; }
+  .scout { transition: none; }
 }
 
 .stage-copy { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -265,6 +336,14 @@ h1, h2, h3 { font-weight: 600; line-height: 1.18; text-wrap: balance; }
   font-size: var(--step-2);
 }
 .working time { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+
+/* Each step replaces the last rather than sliding a list around. */
+.working-step { animation: step-in 0.45s var(--ease) both; }
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .working-step { animation: none; } }
 
 .failed { color: var(--reject); font-size: var(--step-2); }
 

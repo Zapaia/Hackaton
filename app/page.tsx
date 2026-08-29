@@ -37,6 +37,25 @@ const SUGGESTIONS = [
   "Build me the business case for a lunar mining company",
 ]
 
+/**
+ * What the agent is actually doing, in order, while you wait.
+ *
+ * These are not filler: each line names a real step of the pipeline — the question is
+ * rewritten, Cala is searched, the opposing position is sought on purpose, the articles
+ * are pulled, and only then is anything called settled. A loading state is the one place
+ * a user will happily read how a system works.
+ */
+const WORKING_STEPS = [
+  "Reading your question",
+  "Charting a course through the archive",
+  "Searching the treaty record",
+  "Asking who disagrees",
+  "Pulling the articles themselves",
+  "Separating settled law from open debate",
+  "Counting who signed and who refused",
+  "Drawing the scene",
+]
+
 const TONE_LABEL: Record<Answer["tone"], string> = {
   no: "Prohibited",
   yes: "Permitted",
@@ -79,6 +98,91 @@ async function readJson(response: Response) {
   }
 }
 
+type FieldStar = { left: string; top: string; size: number; delay: number }
+type RoutePoint = { left: number; top: number }
+
+const MOON_CRATERS = [
+  { left: "20%", top: "25%", size: 16 }, { left: "59%", top: "20%", size: 26 },
+  { left: "72%", top: "46%", size: 12 }, { left: "37%", top: "57%", size: 21 },
+  { left: "22%", top: "69%", size: 10 }, { left: "67%", top: "75%", size: 17 },
+]
+
+const ROUTE_SLOTS: RoutePoint[] = [
+  { left: 12, top: 24 }, { left: 32, top: 8 }, { left: 57, top: 8 },
+  { left: 82, top: 24 }, { left: 91, top: 57 }, { left: 73, top: 87 },
+  { left: 43, top: 92 }, { left: 17, top: 76 }, { left: 8, top: 52 },
+]
+
+function makeStarField(seed: string): FieldStar[] {
+  let hash = [...seed].reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 17)
+  const next = () => {
+    hash = (hash * 1664525 + 1013904223) >>> 0
+    return hash / 4294967296
+  }
+  return Array.from({ length: 34 }, () => ({
+    left: `${Math.round(next() * 100)}%`,
+    top: `${Math.round(next() * 100)}%`,
+    size: 1 + Math.round(next() * 2),
+    delay: Math.round(next() * 2200),
+  }))
+}
+
+function makeRoutePoints(field: FieldStar[], count: number): RoutePoint[] {
+  let hash = field.reduce(
+    (value, star) =>
+      value ^ Math.round(parseFloat(star.left) * 97 + parseFloat(star.top) * 193),
+    23
+  ) >>> 0
+  const next = () => {
+    hash = (hash * 1664525 + 1013904223) >>> 0
+    return hash / 4294967296
+  }
+  const slots = ROUTE_SLOTS.map((slot) => ({ ...slot }))
+  for (let i = slots.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(next() * (i + 1))
+    ;[slots[i], slots[j]] = [slots[j], slots[i]]
+  }
+  return slots.slice(0, Math.min(count, slots.length))
+}
+
+function routePath(points: RoutePoint[]) {
+  const route = [
+    { left: 50, top: 50 },
+    ...points.flatMap((point) => [point, { left: 50, top: 50 }]),
+  ]
+  return route.map((p, i) => `${i === 0 ? "M" : "L"} ${p.left} ${p.top}`).join(" ")
+}
+
+function routeTarget(step: number, points: RoutePoint[]): RoutePoint {
+  if (step < 1 || points.length === 0) return { left: 50, top: 50 }
+  const point = points[Math.min(points.length - 1, Math.floor((step - 1) / 2))]
+  return step % 2 === 1 ? point : { left: 50, top: 50 }
+}
+
+function MoonBody() {
+  return (
+    <div className="moon-body">
+      {MOON_CRATERS.map((crater, i) => (
+        <span
+          key={i}
+          className="crater"
+          style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function RocketMark() {
+  return (
+    <svg className="rocket-mark" viewBox="0 0 28 28" aria-hidden="true">
+      <path d="M18.9 3.3c-4.2.3-7.7 2.7-9.8 6.1l-2.8.4a1.4 1.4 0 0 0-.9.5l-1.7 2.1 4.4 1.3 2.2 2.2 1.3 4.4 2.1-1.7c.3-.2.5-.6.5-.9l.4-2.8c3.4-2.1 5.8-5.6 6.1-9.8l-1.8-1.8Z" fill="currentColor" />
+      <circle cx="16.8" cy="9.7" r="1.9" fill="var(--sunken)" />
+      <path d="M8.2 17.1c-1.3.1-2.5.7-3.4 1.6-.7.7-.9 1.6-.8 2.5.9.1 1.8-.2 2.5-.8.9-.9 1.5-2.1 1.7-3.3ZM10.9 19.8c-.1 1.3-.7 2.5-1.6 3.4-.7.7-1.6.9-2.5.8-.1-.9.2-1.8.8-2.5.9-.9 2.1-1.5 3.3-1.7Z" fill="currentColor" opacity=".75" />
+    </svg>
+  )
+}
+
 function MoonMark() {
   return (
     <svg className="mark" viewBox="0 0 24 24" aria-hidden="true">
@@ -97,6 +201,9 @@ export default function Mooneto() {
   const [busy, setBusy] = useState(false)
   const [activeQuestion, setActiveQuestion] = useState("")
   const [elapsed, setElapsed] = useState(0)
+  const [step, setStep] = useState(0)
+  const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
+  const [journeyStep, setJourneyStep] = useState(0)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoBusy, setVideoBusy] = useState(false)
   const startedAt = useRef(0)
@@ -119,7 +226,19 @@ export default function Mooneto() {
   useEffect(() => {
     if (!busy) return
     const ticker = window.setInterval(() => setElapsed(Date.now() - startedAt.current), 100)
-    return () => window.clearInterval(ticker)
+    // Advance through the steps and hold on the last one rather than looping, so a long
+    // wait never claims the agent went back to the beginning.
+    const stepper = window.setInterval(
+      () => setStep((current) => Math.min(current + 1, WORKING_STEPS.length - 1)),
+      1900
+    )
+    // The scout flies out to an instrument and back, once per leg.
+    const flight = window.setInterval(() => setJourneyStep((n) => n + 1), 900)
+    return () => {
+      window.clearInterval(ticker)
+      window.clearInterval(stepper)
+      window.clearInterval(flight)
+    }
   }, [busy])
 
   async function submit(question: string) {
@@ -135,6 +254,9 @@ export default function Mooneto() {
     setInput("")
     startedAt.current = Date.now()
     setElapsed(0)
+    setStep(0)
+    setJourneyStep(0)
+    setStarField(makeStarField(`${asked}:${Date.now()}`))
 
     const turn = thread.length
     setThread((t) => [...t, { q: asked }])
@@ -185,6 +307,8 @@ export default function Mooneto() {
     }
   }
 
+  const routePoints = makeRoutePoints(starField, 6)
+  const target = routeTarget(journeyStep, routePoints)
   const showingQuestion = activeQuestion || latest?.question
   const failed = thread[thread.length - 1]?.error
 
@@ -251,8 +375,36 @@ export default function Mooneto() {
               />
             ) : (
               <div className="scene-pending" role="status">
-                <span className="pulse" aria-hidden="true" />
-                <span>{videoBusy ? "Drawing the scene" : "No scene for this question"}</span>
+                <div className="constellation" aria-hidden="true">
+                  {starField.map((star, i) => (
+                    <i
+                      key={i}
+                      className="field-star"
+                      style={{
+                        left: star.left, top: star.top,
+                        width: star.size, height: star.size,
+                        animationDelay: `${star.delay}ms`,
+                      }}
+                    />
+                  ))}
+                  <svg className="route" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d={routePath(routePoints)} />
+                  </svg>
+                  {routePoints.map((point, i) => (
+                    <span
+                      key={i}
+                      className={`instrument-star${journeyStep >= i * 2 + 1 ? " reached" : ""}`}
+                      style={{ left: `${point.left}%`, top: `${point.top}%` }}
+                    />
+                  ))}
+                  <span className="scout" style={{ left: `${target.left}%`, top: `${target.top}%` }}>
+                    <RocketMark />
+                  </span>
+                  <MoonBody />
+                </div>
+                <span className="scene-note">
+                  {videoBusy ? "Drawing the scene" : "No scene for this question"}
+                </span>
               </div>
             )}
 
@@ -261,7 +413,9 @@ export default function Mooneto() {
 
               {busy && (
                 <p className="working" role="status">
-                  Reading the treaties
+                  <span key={step} className="working-step">
+                    {WORKING_STEPS[step]}
+                  </span>
                   <time>{(elapsed / 1000).toFixed(1)}s</time>
                 </p>
               )}
