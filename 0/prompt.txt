@@ -1,0 +1,102 @@
+acordate de ir commiteando en entire, sino no tiene sentido. ademas dame la imagen abierta en el browser sino no la veo
+
+---
+
+no pero eso es una imagen real, lo que te digo es una pequena animacion de alguien minando la luna. o una imagen animada de eso. tiene que aportar al agent
+
+---
+
+en entire no aparece el comit de codex
+
+---
+
+mostrame la animacion
+
+---
+
+la idea justamente es un pequeno producto que ademas de responderte la pregunta como un agente normal de chat (esta vez con informacion de cala) tenga animaciones de fal para aportar a la visual
+
+---
+
+y entonces?
+
+---
+
+no pero vos estas generando video, yo lo que quiero es una mini animacion de una pequena luna donde un rover va excavando, puede ser lo mas sencilla posible. tipo el jueguito del dinosaurio de google cuando no tiene internet
+
+---
+
+genial, lo entendio perfecto. ahora mi consulta, esto se genera en el momento? o esta hardcodeado atras para cuando se pregunte eso?
+
+---
+
+ta bien entiendo, pero en realidad esto tiene que ser interactivo, sino no es un producto, es una respuesta hardcodeada. El agente debe generarla y visualizarla, asi participa dle activo visual. de hecho igual, en este caso esta bien la animacion. lo que yo me imaginaba era algo mas como esto: https://neal.fun/size-of-life/ es lo que nos dieron de ejemplo. un objeto visual, estatico, por ejemplo la luna. a aprtir de eso sale un cohete que muestra el treati buscado por el agente, va el cohete hacia otro y asi hasta todos los vistos y de ahi se despliega la visual de banderas con su veredicto acerca de la pregunta.
+
+---
+
+el cohete realmente tiene que ir por cada tratado, tiene que tenes mas objetos visuales. cada tratado es una estrella por la que el cohete pasa, la luna mas detallada, mas crateres. los paises mas protagonistas con su bandera
+
+---
+
+la respuesta principal y corta arriba de todo, con mas cuerpo.
+
+---
+
+el chat del costado no hace falta, que sea un desplegable en caso de que el usuario lo desee. el protagonista es la visualizacion de la respuesta
+
+---
+
+y a lo que me refiero, a medida que el agente navega literalmente la informacion a la hora de decidir la repsuesta, va pasando el cohete, la animacion gana tiempo de razonamiento dle agente. que las estrellas sean mas randomizadas
+
+---
+
+el bubble de la pregunta tiene que estar a la izquierda arriba, queda ahi, a su derecha se desplega la repsuesta y abajo de donde quedo la pregunta se puede desplegar el informe del agente. todo resto el protagonista es la animacion creada por el agente
+
+---
+
+el bubble esta a la derecha, izquierda dije
+
+---
+
+el informe es desplegable abajo de la bubble, no se abre ventana que se pone sobre encima de todo
+
+---
+
+donde subiste? abrime el chat
+
+---
+
+te dije a la izquierda
+
+---
+
+porque aparece la moon de entrada. es un space law general. la idea es que haya una visualizacion base, de ahi le preguntamos se puede minar en la luna. aparece una luna, de ella sale un cohete que recorre stars aleatorias en la pantalla que son los treaties, de ella el cohete vuelve a la luna, se despliegan los resultados de la consulta. el titulo de la respuesta arriba, abajo de la visualizacion de la una las banderas de cada pais
+
+---
+
+no anda la ultima version
+
+---
+
+buena primera visual, es mejorable le falta cuerpo. cuando apreto ask a question se abre una ventana a la izquierda, lo que quiero es que de la bubble de ask a question se despliegue para ahacer la pregunta ahi, cuando se genera una animacion de navegando las estrellas (por atras se esta navegando la resource en cala) y las animaciones que venimos ahbalndo
+
+---
+
+✦✦✦✦🚀
+Reading Cala’s resource graph… eso no lo dejes asi. tiene que ser dinamico, el cohete tiene que tener la animacion de ir rodeando la luna y las diferentes estrellas puestas aleatoriamente.
+
+---
+
+que modelo de fal usamos, estoy con un experto
+
+---
+
+abrime los videos que generaste
+
+---
+
+dame el prompt que usamos
+
+---
+
+bien, ahi estuve con el experto. lo que me dijo es que pruebe el modelo de MiniMax H3 Max, que en eso le pida esto que quiero. animaciones super simples y cartoon, de lo que estoy preguntando, mientras se genera la respuesta. basicamente el truco esta en el prompt que le paso, y que ademas prompt mas grandes suelen dar mejores resultados. ojo con lo mucho que probas porque es caro, pero de nuevo, mejoremos el prompt totalmente. la idea es totalmnete cartoon, como lo que estas generando con codigo.
