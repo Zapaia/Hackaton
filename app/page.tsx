@@ -7,6 +7,7 @@ type Claim = { text: string; sources: Source[]; label: string; why: string }
 type Country = { name: string; stance: string; why: string }
 type Answer = {
   question: string
+  resolved?: string
   verdict: string
   tone: string
   claims: Claim[]
@@ -51,10 +52,15 @@ export default function Mooneto() {
     setThread((t) => [...t, { q: question }])
 
     try {
+      // Cala answers questions in isolation, so follow-ups need the thread
+      // rewritten into a standalone question server-side.
+      const history = thread.flatMap((t) =>
+        t.a ? [`Q: ${t.q}`, `A: ${t.a.verdict}`] : []
+      )
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, history }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "request failed")
@@ -99,6 +105,9 @@ export default function Mooneto() {
                 {turn.a && (
                   <div className="a">
                     <p className="lead">{turn.a.verdict}</p>
+                    {turn.a.resolved && turn.a.resolved !== turn.q && (
+                      <p className="resolved">interpreted as: “{turn.a.resolved}”</p>
+                    )}
                     {turn.a.claims.map((c, j) => (
                       <div className="claim" key={j}>
                         <span className={`tag ${c.label}`}>{c.label}</span>
