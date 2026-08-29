@@ -1,93 +1,81 @@
-# State — updated 2026-08-29, mid-build
+# Mooneto — current state
 
-Submission is due **19:00**. Code freezes at **18:00**; the last hour is video + docs.
+Updated **29 August 2026** for final submission. The product is in demo-ready state;
+remaining work is recording and submitting the links, not feature construction.
 
-## Working and verified
+## Submission links
 
-| Piece | Status |
+- **Public demo:** https://www.ramirozapaia.com/mooneto
+- **Public source:** https://github.com/Zapaia/Hackaton
+- **Standalone Vercel project:** `zapaias-projects/mooneto`
+
+The portfolio repository remains separate. It proxies `/mooneto` to the Mooneto Vercel
+deployment, so the source, corpus and assets stay in this repository.
+
+## Implemented and verified
+
+| Area | Current state |
 |---|---|
-| Next.js app, chat + stage layout | ✅ verified in browser at 1440×900 |
-| Cala client with 5xx retry | ✅ `lib/mooneto/cala.ts` |
-| Adversarial retrieval (asks who disagrees, merges) | ✅ produces a real split |
-| Follow-up rewriting against thread history | ✅ `lib/mooneto/rewrite.ts` |
-| OpenAI classifier: settled / disputed / unsupported | ✅ `lib/mooneto/classify.ts` |
-| Country stances: enables / rejects / unclear | ✅ US, LU, JP, AE enable; RU rejects |
-| Disk cache keyed on question + history | ✅ replays the whole script in 0.3s |
-| Entire capturing sessions per commit | ✅ 2 checkpoints pushed to origin |
+| Visual product | Moon-centered case file with a clear verdict, treaty evidence, country stances and follow-up questions. |
+| Free-form questions | OpenAI rewrites varied wording into a standalone space-law query; no phrase-to-answer map. |
+| Cala retrieval | Main and opposing searches run in parallel; claims, explainability, laws and countries are parsed. |
+| Legal corpus | `scripts/corpus.ts` scanned all six `CORE` names once, sequentially with pauses; `data/corpus.json` is committed and read at runtime. |
+| Grounding | Only claims with a cited structured provision can remain `settled` or `disputed`; otherwise code forces `unsupported`. |
+| Evidence UI | Provision law, year and text are shown directly. Blog/commentary links are not shown as authority. |
+| Jurisdiction UI | Countries are ordered by `enables`, `rejects`, `unclear`, with flag, stance and reason visible. |
+| Decision memo | Business/strategy prompts render route, legal basis, open risks and ratification/national-law/dissent confidence. |
+| Visual generation | fal `minimax/h3-max/text-to-video` can generate a short cartoon activity scene in parallel with `/api/ask`; CSS constellation is the fallback. |
+| Traceability | Commits are pushed to `origin/main` and captured as Entire checkpoints. |
+| Deployment | Public page, assets and `/mooneto/api/ask` have been verified with HTTP 200. |
 
-**Beat 1** ("Can I own a plot of land on the Moon?") — verified end to end in the browser.
-Red verdict, 5 settled claims with real source links, 2 treaty cards, US flag.
+## Required legal-corpus verification
 
-**Beat 2** ("But can I keep the resources I extract there?") — verified. Green verdict,
-5 treaty cards, flags split across enables / rejects / unclear.
+The required question was run after the corpus change:
 
-## Evidence is now restricted to legal instruments
+`Can I own a plot of land on the Moon?`
 
-`lib/mooneto/laws.ts` pulls the articulated provisions of every Law entity Cala names, and
-a claim may only be labelled `settled` or `disputed` if it cites one — enforced in code.
-Scholarly commentary and blog-sourced statements fall to `unsupported`, which is the
-correct and intended behaviour.
+The live result had a non-zero settled count and included a claim citing **Moon
+Agreement (1979)**. The public deployment check recorded three settled claims and a
+Moon Agreement citation. If a future run returns zero instruments or every claim is
+unsupported, treat it as a retrieval failure and do not present that run as a demo.
 
-**Known limitation:** the corpus covers only the instruments a given query named. Always
-loading the six core treaties was tried and reverted — it trips Cala's rate limit and
-collapses every claim to unsupported. See ROADMAP item 0 for the fix.
+## Runtime flow
 
-## Open work, in priority order
+1. Check the answer cache.
+2. Rewrite the question with OpenAI, preserving the user's language and thread context.
+3. Search Cala for the main reading and explicitly for opposition.
+4. Merge the committed corpus with any extra Law entity Cala names.
+5. Classify claims and country stances with OpenAI, enforcing provision grounding in
+   TypeScript.
+6. Build a decision memo only when the question asks for a plan or business route.
+7. In parallel, request an illustrative fal scene; render it when ready without blocking
+   the legal response.
 
-### ~~1. Beat 3~~ — DONE
+## Known limitations (acceptable for the submission)
 
-Beat 3 now returns a decision memo: a verdict naming a country to incorporate in, a
-numbered route with the legal basis per step, open risks with their triggers, and three
-confidence components. The national-law and dissent lines are **derived from the country
-stances in the case file**, not written by the model — it was claiming no major power
-dissents while the findings listed Russia as rejecting.
+- Cala latency varies substantially on a cold request. The UI keeps the answer and video
+  requests independent, and `scripts/warm.sh` is available for local rehearsal.
+- `.cache/` is a best-effort disk cache. It is useful locally but should be considered
+  ephemeral on Vercel serverless instances.
+- The visual scene selector is intentionally conservative and illustrative. It chooses
+  a physical activity description; it never decides the legal verdict or draws legal
+  facts into generated pixels.
+- MiniMax H3 Max currently requires a 5–15 second duration. Mooneto requests the lowest
+  valid duration and loops the silent clip in the browser.
+- The committed corpus contains structured provisions Cala exposed for Outer Space
+  Treaty (1967), Moon Agreement (1979) and Artemis Accords (2020). Rescue, Liability
+  and Registration were scanned but omitted when Cala returned no structured
+  `key_provisions`; no text was fabricated.
 
-Verified in the browser: all three beats run end to end, and the flags render split
-(United States enables; Russia, China, India reject).
-
-### 1. Superseded — original note kept below for context
-"Build me the business case for a lunar mining company" currently returns another
-Q&A answer ("The legality of lunar mining is currently disputed among states").
-It does **not** build a business case.
-
-It should produce: a recommended jurisdiction to incorporate in, the legal basis for
-that recommendation, and the risks that stay open. This is the payoff of the whole demo
-and it is the difference between a lookup tool and the case-file product we pitched.
-
-Likely shape: a second prompt path in `classify.ts` that, when the question asks for a
-plan rather than a fact, composes a recommendation from the accumulated thread instead
-of a claim list.
-
-### 2. Fifteen claims is a wall of text
-Merging the main query with the opposition query doubles the claims. The chat panel
-becomes unreadable. Options: group by label, collapse the agreeing ones, or cap at the
-strongest N per label.
-
-### 3. fal is not integrated at all
-Planned uses, in order of value: the business-case illustration (live), treaty card art
-(pre-generated, cached in repo), lunar backdrop (pre-generated). Not required to hit the
-three-partner minimum — Cala, OpenAI and Entire already do that — so this is upside.
-
-### 4. Hosting
-Target was `ramirozapaia.com/Mooneto`. Decision taken: build here, host later. A Vercel
-deploy of this repo is the straightforward path; the portfolio can rewrite to it.
-
-### 5. The 2-minute video
-The script is the three beats, in order, with the cache warm so every answer is instant.
-
-## Known issues
-
-- **Cala latency is wildly variable**: 3s to 43s for the same class of query, plus
-  intermittent 502s. Mitigated by retry + cache. Always run `scripts/warm.sh` before
-  demoing or recording.
-- **Classification is not perfectly stable**: the Artemis Accords claim came back
-  `settled` on one run and `disputed` on another. Temperature is already 0.
-- Automated browser clicks against the dev server are flaky before hydration; this is a
-  test-tooling annoyance, not a product bug.
-
-## Run it
+## Local commands
 
 ```bash
+pnpm install
+cp .env.example .env.local
 pnpm dev                  # http://localhost:3005
-bash scripts/warm.sh      # pre-warm the demo answers
+pnpm build
+bash scripts/warm.sh     # optional local rehearsal cache
 ```
+
+See [docs/VIDEO_SCRIPT.md](VIDEO_SCRIPT.md) for the exact two-minute walkthrough and
+[docs/DEPLOYMENT.md](DEPLOYMENT.md) for production configuration.

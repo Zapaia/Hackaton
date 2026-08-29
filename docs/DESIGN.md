@@ -1,120 +1,116 @@
-# Mooneto — Design
+# Mooneto — product and design notes
 
-> A visual legal advisor for people and businesses that want to operate in space.
-> It does not tell you what to do. It tells you **what is settled, what is disputed, and where it is written** — and builds a traceable case file as you explore.
+## Product thesis
 
----
+Space-law research is difficult because the answer is often a disagreement between
+instruments and jurisdictions, not a single fact. Mooneto makes that uncertainty
+legible. The visual scene is the entry point, but the evidence panels are the product:
+the user can see what the agent found, what provision supports it and who reads the
+issue differently.
 
-## 1. The problem
+Mooneto is a research aid, not a law firm or a legal opinion. It deliberately uses
+`unsupported` when the retrieved legal corpus does not establish a claim.
 
-Space law lives in five treaties from the 1960s and 70s, a handful of national statutes, and a set of non-binding accords. Large parts of it are genuinely unresolved.
+## Experience
 
-Ask a lawyer: expensive and slow. Ask a general chatbot: it answers confidently, sometimes wrongly, and **you cannot tell which parts are settled law and which are open debate.**
+The page is a single visual case file:
 
-In space law, the unresolved parts are exactly where the money and the risk are.
+1. The user submits a natural-language question from the inline ask control.
+2. A Moon-and-stars route gives the agent's research work a visible rhythm. The rocket
+   visits separated treaty stars and returns to the Moon; stars are seeded per question
+   so the layout changes without collisions.
+3. A fal-generated physical-activity clip can replace the waiting constellation as soon
+   as it arrives. It is muted, loops in place and is never the source of legal meaning.
+4. The short verdict lands first, with the original question and any precise rewritten
+   reading beneath it.
+5. The report follows in normal document flow: treaty provisions on one side and
+   jurisdiction positions on the other. There is no overlay window hiding the answer.
+6. Strategy questions add a decision memo with route, risks and confidence components.
 
-> **The problem: you cannot distinguish "this is settled" from "nobody knows". That distinction is the entire decision.**
+The layout prioritizes the visual answer over a conventional chat transcript. Follow-up
+questions remain available so the user can build a case file without losing context.
 
-The canonical example: you can never own lunar land (Outer Space Treaty, Article II — settled, 110+ parties). But whether you can own what you *extract* from it depends on where your company is incorporated. The US (2015) and Luxembourg (2017) say yes. The Moon Agreement says no. Russia and China reject the Artemis reading.
+## Information hierarchy
 
-The answer is not yes or no. It is **under whose flag are you registered.**
+The visible order is intentional:
 
-## 2. What it does
+1. **Verdict** — one sentence, one of Prohibited / Permitted / Depends on jurisdiction.
+2. **Activity scene** — a visual cue for what is being discussed, never a legal claim.
+3. **Treaty evidence** — law, year, articulated provision and grounded-claim count.
+4. **Jurisdiction positions** — flag, country, enables/rejects/unclear stance and reason.
+5. **Decision memo** — only when the question requests an actionable route.
 
-A single page: a chat on the left, a live visualization on the right.
+The UI never displays Cala blog links as if they were primary authority. A claim is
+strong only when its `provision` object is present. Unsupported claims are muted and
+explain why no evidence is shown.
 
-Every answer is decomposed into individual claims, and each claim is labelled:
+## Trust boundary
 
-| Label | Meaning |
-|---|---|
-| **Settled** | Backed by a ratified treaty with broad adherence and no major-power dissent |
-| **Disputed** | Real legal disagreement — both readings shown, with who holds each |
-| **Unsupported** | No verified source found. The system says so instead of inventing |
+The system has three distinct layers:
 
-## 3. The demo (three beats)
-
-**Beat 1 — "Can I own a plot of land on the Moon?"**
-Answer: **No.** The Moon renders, surrounded by cards for the treaties that forbid it. Article II is quoted with its source URL.
-
-**Beat 2 — "But can I keep what I extract there?"**
-Answer: **Yes and no.** The view splits into flags: states that enable it by national law vs states that reject that reading. A legal-confidence score appears, broken into its components.
-
-**Beat 3 — "Build me the business case."**
-A viable route (where to incorporate), the risks that remain open, and a generated illustration of the operation.
-
-Throughout, every step is committed — so the user leaves with a **sourced decision trail**, not a chat log.
-
-## 4. Architecture
-
-```
-Question
-   │
-   ▼
-Cala  POST /v1/knowledge/search
-   │   → content       markdown answer
-   │   → explainability answer split into individual claims + references
-   │   → context        real sources with URLs
-   │   → entities       typed entities (Law, Company, Place...)
-   ▼
-Classifier
-   │   each claim → settled | disputed | unsupported
-   ▼
-Country stance resolver
-   │   treaty ratification seed + national statutes → per-country position
-   ▼
-OpenAI
-   │   composes the actionable answer
-   ▼
-UI  (chat + moon + treaty cards + flags + score)
-   │
-   ▼
-Entire
-       each answered question is committed → checkpoint carries the full
-       reasoning session → `entire search` makes it retrievable as precedent
-```
-
-## 5. Partner technology
-
-| Partner | Role | Why it is load-bearing |
+| Layer | Source | Allowed to decide |
 |---|---|---|
-| **Cala** | Source of verified legal knowledge | `entity_type: "Law"` covers space treaties. `explainability` returns claim-level statements with references — the substrate the whole product classifies |
-| **OpenAI** | Reasoning and answer composition | Turns classified claims into an actionable answer |
-| **fal** | Visual generation | Treaty cards and the lunar backdrop (pre-generated, cached); the business-case illustration (live) |
-| **Entire** | Traceability and precedent | Each answer is a checkpoint carrying its full reasoning session; `entire search` lets the advisor query its own past reasoning |
+| Retrieval | Cala search, explainability and entities | Which claims, laws and countries are in the case file. |
+| Authority | Versioned structured provisions in `data/corpus.json` plus explicitly named extra laws | Whether a claim has legal evidence. |
+| Composition | OpenAI classifier and memo path | Labels, verdict wording, country explanations and a route derived from the evidence. |
 
-**Design rule for fal:** anything that carries *information* (treaty names, flags, country identity) is exact UI, never generated. fal is used where the image is *illustrative*. Generated images render text unreliably, are slow, and are non-deterministic — unacceptable for the informational layer of a legal tool.
+TypeScript enforces the trust boundary after the model responds: without a cited
+provision, `settled` and `disputed` are downgraded to `unsupported`. This keeps a prompt
+mistake from becoming an apparent legal fact.
 
-## 6. The legal-confidence score
+## Visual generation rule
 
-Never a magic number. A composite of three visible components, each expandable:
+fal is deliberately used for the part that benefits from generative variation: a tiny
+cartoon of a rover, a survey flag, a rocket or a satellite performing a physical action.
+The prompt forbids text, logos, country flags, faces, treaty names and legal outcomes.
+All meaningful labels and data are exact React/HTML/CSS, so an image model can never
+invent the information the user is relying on.
 
-1. **Ratification depth** — how many states are party to the governing treaty
-2. **Enabling national law** — does the jurisdiction have a statute permitting it
-3. **Major-power dissent** — do China or Russia reject the reading
+## Technical architecture
 
-## 7. Data sources
+```text
+Question
+  ├─ /api/ask
+  │    cache → OpenAI standalone rewrite
+  │          → Cala main + opposition search
+  │          → committed corpus + extra Law lookups
+  │          → OpenAI labels, verdict and stances
+  │          → optional plan memo
+  │
+  └─ /api/video
+       physical scene prompt → fal MiniMax H3 Max
 
-- **Cala API** — treaties, statutes, cases, entities (primary)
-- **Curated seed** — ratification lists for the five UN space treaties plus Artemis Accords signatories. Public, small, and exact; used so country positions are never hallucinated
+Answer + optional scene → app/page.tsx → evidence-led visual case file
+```
 
-## 8. Non-goals
+The six baseline instruments are generated once with `scripts/corpus.ts`, not fetched
+for every request. Runtime extra-law lookup remains sequential and cached because a
+question may name a national statute outside the baseline.
 
-No authentication, no database, no user history, no mobile layout. None of it appears in the demo, and all of it costs time that the demo needs.
+## Design decisions
 
-## 9. Risks and mitigations
+- **Single page:** preserves the narrative of one question becoming one case file.
+- **No CSS framework:** the hand-written stylesheet keeps the visual language small,
+  stable and easy to evaluate in a two-minute demo.
+- **Deterministic legal UI:** treaty text, country names, flags and statuses must be
+  readable and reproducible.
+- **Parallel answer/video requests:** slow illustration generation cannot block the
+  legal response, and a failed video cannot erase the answer.
+- **Graceful degradation:** no `FAL_KEY` or a failed generation returns the CSS route;
+  no provision returns a clear unsupported state.
+- **Thread-aware follow-ups:** history is rewritten server-side rather than relying on
+  hardcoded phrasings such as “mine in the Moon”.
 
-| Risk | Mitigation |
-|---|---|
-| Cala does not return structured country positions | Curated ratification seed in-repo |
-| No Fastino API access at the event | OpenAI performs classification; still four partners |
-| Map/visual runs long | Degrade to a coloured country list; the demo still works |
+## Accessibility and resilience
 
-## 10. Schedule (submission 19:00)
+The interface uses semantic sections, headings, status roles, visible focus states,
+descriptive labels for the video and reduced-motion styles. The report stays in normal
+flow on narrow screens. API responses are parsed defensively so an HTML proxy error is
+shown as an actionable message instead of a JSON parser stack trace.
 
-| By | Deliverable |
-|---|---|
-| 14:30 | Cala + classification working, no UI |
-| 16:00 | Visualization rendering |
-| 17:00 | Entire precedent integration |
-| 18:00 | Polish and demo rehearsal |
-| 19:00 | **Code frozen at 18:00.** Video, README, API docs |
+## Scope and limitations
+
+This submission optimizes for a compelling, inspectable demo rather than a production
+legal service. It has no accounts, database, billing or saved user history. Cala can be
+slow or temporarily unavailable; the committed corpus protects the core evidence but
+cannot make fresh retrieval instantaneous. Serverless disk caches are best effort.

@@ -1,122 +1,95 @@
-# Roadmap — pick up here
+# Mooneto — roadmap and final checklist
 
-Ordered by value. Each item is self-contained: paste the brief into Codex and it can work
-without this conversation. Read `docs/STATE.md` first for what already works.
+This file is now a completion record rather than an open build brief. Read
+[STATE.md](STATE.md) for the verified implementation state.
 
----
+## Completed roadmap items
 
-## 0. Finish the legal corpus  ·  **do this first**
+### 0. Finish the legal corpus — complete
 
-### What was just built
+The six instruments in `CORE` are scanned by `scripts/corpus.ts` once, sequentially,
+with a delay between calls. The generated `data/corpus.json` is committed. Runtime
+`corpus()` reads that file and only looks up additional non-core laws that Cala names.
+This keeps the six-instrument baseline out of the request path and avoids Cala's 429
+rate-limit failure.
 
-Claims are no longer judged against Cala's prose. `lib/mooneto/laws.ts` looks up each
-`Law` entity Cala names and pulls its `key_provisions` — the articulated rule — and
-`lib/mooneto/classify.ts` may only label a claim `settled` or `disputed` if it cites one
-of those provisions. **The rule is enforced in code, not in the prompt:** if the model
-returns no provision index, the claim is forced to `unsupported`.
+The required ownership question was verified with a non-zero settled count and a Moon
+Agreement citation. Instruments for which Cala exposed no structured
+`key_provisions` are omitted rather than invented.
 
-The product principle behind it, in the user's words: *"from Cala we take only what is
-reliable and jurisdictional. A lawyer relies on that, not on what a blog says."*
+Checkpoint commit: `66e86de feat: commit the core legal corpus to avoid request-time rate limits`.
 
-Verified working: "Can I own a plot of land on the Moon?" returns 4 settled claims, each
-citing Outer Space Treaty Article II or the Artemis Accords, and 8 unsupported — including
-the scholarly opinions, which are commentary and not authority. That is correct behaviour.
+### 1. Show the provision instead of the blog link — complete
 
-### The limitation, and the attempt that failed
+The evidence panel in `app/page.tsx` renders the law name, year, exact provision text
+and grounded-claim count. Blog/source URLs are not rendered as authority. Unsupported
+claims remain visibly weaker and have no provision box.
 
-The corpus is built only from the instruments **that particular query happened to name**.
-So a claim about the Moon Agreement comes back `unsupported` whenever the query did not
-surface that entity, even though the Moon Agreement is squarely relevant.
+Checkpoint commit: `9e110f9 feat: show legal provisions as claim evidence`.
 
-The obvious fix — always load the six core instruments — **was tried and reverted**.
-Six laws × two Cala calls each, issued per request, trips Cala's rate limit (HTTP 429).
-`corpus()` then returns empty, and because the code rule requires a citation, **every
-claim collapses to `unsupported`**. All 12 went grey. The constant survives in
-`laws.ts` as `CORE`, exported but deliberately not wired in.
+### 2. Render the decision memo — complete
 
-> **Codex brief:** The corpus must not be fetched at request time. Write
-> `scripts/corpus.ts` that looks up the six instruments in `CORE` (exported from
-> `lib/mooneto/laws.ts`) **once**, sequentially, with a delay between calls to respect
-> Cala's rate limit, and writes the result to `data/corpus.json`, committed to the repo.
-> Then change `corpus()` in `laws.ts` to read that file and merge in any additional law
-> the query names (still cached). Verify with "Can I own a plot of land on the Moon?"
-> that claims about the Moon Agreement now cite it instead of coming back unsupported,
-> and that the settled count does **not** drop to zero. If it drops to zero, the corpus
-> failed to load — do not ship that.
+Plan questions render the recommended route, legal basis per step, open risks and the
+three confidence components. The memo is derived from the accumulated case file and
+country stances. `lib/mooneto/plan.ts` remains unchanged in the submission pass.
 
-## 1. Show the provision instead of the blog link  ·  **highest visible value**
+Checkpoint commits include `9b9aa04` and `c9a8382`.
 
-Claims now carry a `provision` object (`law`, `year`, `text`), but `app/page.tsx` still
-renders the old `sources` links, which point at blogs like `newspaceeconomy.ca`. The whole
-point of item 0 is undone if the UI keeps showing the blog.
+### 3. Trim the claim wall — intentionally deferred
 
-> **Codex brief:** In `app/page.tsx`, when a claim has a `provision`, render the provision
-> as its evidence — law name, year, and the articulated text — styled distinctly from the
-> claim itself. Remove the blog `sources` links from the claim view entirely; they are
-> secondary commentary and must not appear as authority. Unsupported claims show no
-> evidence and should read as visibly weaker. Use the tokens already in
-> `app/globals.css`; do not add a CSS framework.
+The UI keeps the complete claim set available because disputed and unsupported claims
+are useful evidence of uncertainty. This is a readability improvement for a later
+iteration, not a submission blocker; the primary visual now leads with the verdict,
+provisions and jurisdiction panels.
 
-## 2. Render the memo in the UI  ·  **required for the demo**
+### 4. Integrate fal — complete for the visual track
 
-**Status:** not started. The API returns `plan`, the page ignores it.
+`app/api/video/route.ts` requests a short MiniMax H3 Max cartoon scene in parallel with
+the legal answer. A mining question can show a toy rover; other physical activities
+receive a similarly minimal scene. The browser loops the silent clip and falls back to
+the CSS constellation when generation is unavailable. Treaty names, flags and legal
+outcomes remain exact HTML data.
 
-`app/page.tsx` renders `verdict` + `claims` only. When `plan` is present it should render
-the route, the risks, and the three confidence components instead of a claim list.
+Relevant checkpoints: `5ddbaef`, `877b9e8`, `b74939c`, `69d7480`.
 
-> **Codex brief:** In `app/page.tsx`, when an answer has a `plan` field, render it as a
-> decision memo: the verdict, then the numbered route with its legal basis per step, then
-> the risks, then the three confidence lines. Style with the existing tokens in
-> `app/globals.css` — do not add a CSS framework. The claim list should not appear for
-> plan answers.
+### 5. Deploy — complete
 
-## 3. Trim the wall of claims
+Mooneto is deployed as its own Vercel project and exposed through the portfolio proxy:
 
-**Status:** open. Merging the main query with the opposition query yields ~15 claims,
-which is unreadable in the chat panel.
+**https://www.ramirozapaia.com/mooneto**
 
-> **Codex brief:** In `app/page.tsx`, cap the rendered claims: show all `disputed` and
-> `unsupported` ones (they are the point of the product) but collapse `settled` ones past
-> the first three behind a "show N more" toggle.
+The source remains in [Zapaia/Hackaton](https://github.com/Zapaia/Hackaton). Production
+secrets are stored in Vercel and are not committed. Page, asset and `/api/ask` checks
+passed after deployment. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
-## 4. Integrate fal  ·  upside, not required
+### 6. Two-minute video — ready to record
 
-Three partners are already met (Cala, OpenAI, Entire), so this is bonus points.
+The exact narration, actions and timing are in [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md). The
+three beats are:
 
-Order of value: business-case illustration (generated live on beat 3), treaty card art
-(pre-generate the five, commit them), lunar backdrop (pre-generate once).
+1. ownership of lunar land → prohibited, provision-grounded answer;
+2. ownership of extracted resources → split country positions;
+3. lunar mining business case → route, risks and confidence memo.
 
-**Design rule that must not be broken:** anything carrying information — treaty names,
-flags, country identity — stays exact UI. fal is only for illustration. Generated images
-render text unreliably.
+## Final submission checklist
 
-> **Codex brief:** Add `lib/mooneto/fal.ts` calling fal's image API with `FAL_KEY` from
-> env. Use it only for the business-case illustration on beat 3, and add a script that
-> pre-generates the five treaty card images into `public/treaties/`. Never generate flags
-> or any image containing text that carries meaning.
+- [x] Public URL works: `https://www.ramirozapaia.com/mooneto`
+- [x] Public GitHub repository: `https://github.com/Zapaia/Hackaton`
+- [x] README includes setup, environment variables, architecture, API shapes and tool roles
+- [x] `docs/API.md` documents `/api/ask`, `/api/video`, corpus refresh and error behavior
+- [x] `docs/VIDEO_SCRIPT.md` contains the 2-minute live walkthrough
+- [x] `docs/DEPLOYMENT.md` records the Vercel/subpath architecture and verification
+- [x] `data/corpus.json` is versioned; core laws are not fetched per request
+- [x] API keys remain server-side and are absent from Git
+- [x] `pnpm build` and `git diff --check` pass before the documentation commit
+- [ ] Record and upload the final ≤2-minute demo video (Loom or equivalent)
+- [ ] Submit the demo URL, public repo URL and live URL in the hackathon form
 
-## 5. Deploy
+## Do not break before submission
 
-Target was `ramirozapaia.com/Mooneto`. Decision: build standalone here, host after.
-
-> **Codex brief:** Deploy this repo to Vercel. Set `CALA_API_KEY` and `OPENAI_API_KEY` as
-> environment variables in the Vercel project. Confirm `/api/ask` works in production,
-> and note the deployment URL in the README.
-
-## 6. The 2-minute video  ·  **18:00–19:00, no code**
-
-Script is the three beats in order. **Run `bash scripts/warm.sh` first** so every answer
-is instant — Cala takes up to 43 seconds cold.
-
-1. Beat 1 — "Can I own a plot of land on the Moon?" → red verdict, treaty cards
-2. Beat 2 — "But can I keep the resources I extract there?" → green verdict, flags split
-3. Beat 3 — "Build me the business case for a lunar mining company" → the memo
-4. Close on Entire: `entire checkpoint list`, showing each decision carries its reasoning
-
-## Do not break
-
-- `.env.local` and `.cache/` stay out of git.
-- The three-partner story: **Cala** is the verified source, **OpenAI** classifies,
-  **Entire** carries traceability. Do not let any of them become decorative.
-- Commit often. Every commit becomes an Entire checkpoint carrying its session — that is
-  part of the pitch, not housekeeping.
+- Do not add runtime fetching of all six core laws.
+- Do not replace provision evidence with blogs or generated text.
+- Do not put legal facts, treaty names or flags inside fal artwork.
+- Do not commit `.env.local`, `.cache/` or Vercel secrets.
+- Do not touch `lib/mooneto/plan.ts` or memo rendering during recording prep.
+- Keep the final commit pushed so Entire can show the implementation trail.
