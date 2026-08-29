@@ -60,14 +60,43 @@ function depictsMining(answer: Answer | null) {
   )
 }
 
+type FieldStar = { left: string; top: string; size: number; delay: number }
+
+function makeStarField(seed: string): FieldStar[] {
+  let hash = [...seed].reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 17)
+  const next = () => {
+    hash = (hash * 1664525 + 1013904223) >>> 0
+    return hash / 4294967296
+  }
+  return Array.from({ length: 42 }, () => ({
+    left: `${Math.round(next() * 100)}%`,
+    top: `${Math.round(next() * 100)}%`,
+    size: 1 + Math.round(next() * 2),
+    delay: Math.round(next() * 2200),
+  }))
+}
+
 export default function Mooneto() {
   const [thread, setThread] = useState<Array<{ q: string; a?: Answer; error?: string }>>([])
   const [latest, setLatest] = useState<Answer | null>(null)
   const [input, setInput] = useState("")
   const [busy, setBusy] = useState(false)
   const [showChat, setShowChat] = useState(false)
+  const [showReport, setShowReport] = useState(false)
+  const [activeQuestion, setActiveQuestion] = useState("")
+  const [exploring, setExploring] = useState(false)
+  const [reasoningMs, setReasoningMs] = useState(0)
+  const [thinkingMs, setThinkingMs] = useState(0)
+  const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
   const bottom = useRef<HTMLDivElement>(null)
+  const thinkingStarted = useRef(0)
   const miningScene = depictsMining(latest)
+
+  useEffect(() => {
+    if (!exploring) return
+    const ticker = window.setInterval(() => setThinkingMs(Date.now() - thinkingStarted.current), 100)
+    return () => window.clearInterval(ticker)
+  }, [exploring])
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" })
@@ -76,6 +105,14 @@ export default function Mooneto() {
   async function submit(question: string) {
     if (!question.trim() || busy) return
     setBusy(true)
+    setActiveQuestion(question.trim())
+    setShowReport(false)
+    setExploring(true)
+    thinkingStarted.current = Date.now()
+    setThinkingMs(0)
+    setReasoningMs(0)
+    setStarField(makeStarField(`${question}:${Date.now()}`))
+    setLatest(null)
     setInput("")
     const turn = thread.length
     setThread((t) => [...t, { q: question }])
@@ -100,9 +137,12 @@ export default function Mooneto() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "request failed")
+      setReasoningMs(Date.now() - thinkingStarted.current)
+      setExploring(false)
       setThread((t) => t.map((x, i) => (i === turn ? { ...x, a: data } : x)))
       setLatest(data)
     } catch (err: any) {
+      setExploring(false)
       setThread((t) => t.map((x, i) => (i === turn ? { ...x, error: err.message } : x)))
     } finally {
       setBusy(false)
@@ -229,57 +269,73 @@ export default function Mooneto() {
           <button className="chat-toggle" type="button" onClick={() => setShowChat(true)} aria-expanded={showChat}>
             <span>＋</span> Ask a question
           </button>
-          {latest && <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>}
-
-          <div className={`case-visual${latest ? " active" : ""}`}>
-            <div className="moon-origin">
-              <div className="moon">
-                {MOON_CRATERS.map((crater, i) => (
-                  <span
-                    className="crater"
-                    key={i}
-                    style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }}
-                  />
-                ))}
-                {miningScene && <span className="moon-rover">▰</span>}
-              </div>
-              <span className="origin-label">the Moon</span>
-            </div>
-
-            {latest && (
-              <div className="evidence-route" aria-label="Legal route found by the agent">
-                <span className="route-label">instruments found</span>
-                {latest.laws.map((law, i) => (
-                  <div className="treaty-flight" key={law} style={{ animationDelay: `${i * 180}ms` }}>
-                    <span className="rocket" aria-hidden="true">🚀</span>
-                    <span className="flight-line" />
-                    <span className="star" aria-hidden="true">✦</span>
-                    <span className="treaty-node">{law}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="visual-stars" aria-hidden="true">
+            {starField.map((star, i) => (
+              <i key={i} style={{ left: star.left, top: star.top, width: star.size, height: star.size, animationDelay: `${star.delay}ms` }} />
+            ))}
           </div>
 
-          {latest && latest.countries.length > 0 && (
-            <div className="jurisdictions" aria-label="Country positions found by the agent">
-              <span className="jurisdictions-label">jurisdictions reached</span>
-              <div className="flags">
-                {latest.countries.map((c, i) => (
-                  <div
-                    className={`flag ${c.stance}`}
-                    key={c.name}
-                    title={c.why}
-                    style={{ animationDelay: `${latest.laws.length * 180 + i * 70}ms` }}
-                  >
-                    <span className="em">{flag(c.name)}</span>
-                    <span>{c.name}</span>
-                    <span className="st">{c.stance}</span>
-                  </div>
-                ))}
+          {(activeQuestion || latest) && (
+            <div className="stage-header">
+              <div className="question-cluster">
+                <div className="stage-question">{activeQuestion || latest?.question}</div>
+                {latest && (
+                  <>
+                    <button className="report-toggle" type="button" onClick={() => setShowReport((open) => !open)} aria-expanded={showReport}>
+                      {showReport ? "Hide agent report" : "Open agent report"} <span>{showReport ? "↑" : "↓"}</span>
+                    </button>
+                    {showReport && (
+                      <div className="agent-report">
+                        <div className="report-counts"><span>{latest.laws.length} instruments</span><span>{latest.countries.length} jurisdictions</span></div>
+                        {!latest.plan && latest.claims.slice(0, 6).map((claim, i) => (
+                          <div className="report-line" key={i}><span className={`tag ${claim.label}`}>{claim.label}</span><span>{claim.text}</span></div>
+                        ))}
+                        {latest.plan && <p className="report-note">Decision memo assembled from the accumulated case file.</p>}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
+              {latest && !exploring && <div className={`answer-card ${latest.tone}`}><span>agent answer</span><p>{latest.verdict}</p></div>}
             </div>
           )}
+
+          {exploring && (
+            <div className="exploration" aria-live="polite">
+              <div className="exploration-track">
+                {Array.from({ length: 6 }, (_, i) => <span className="scout-star" key={i} style={{ animationDelay: `${i * 420}ms` }}>✦</span>)}
+                <span className="scout-rocket" aria-hidden="true">🚀</span>
+              </div>
+              <p>Tracing the legal constellation…</p>
+              <small>{(thinkingMs / 1000).toFixed(1)}s</small>
+            </div>
+          )}
+
+          {!exploring && <div className={`case-visual${latest ? " active" : ""}`}>
+              <div className="moon-origin">
+                <div className="moon">
+                  {MOON_CRATERS.map((crater, i) => <span className="crater" key={i} style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }} />)}
+                  {miningScene && <span className="moon-rover">▰</span>}
+                </div>
+                <span className="origin-label">the Moon</span>
+              </div>
+
+              {latest && <div className="evidence-route" aria-label="Legal route found by the agent">
+                <span className="route-label">instruments found</span>
+                {latest.laws.map((law, i) => (
+                  <div className="treaty-flight" key={law} style={{ animationDelay: `${i * 180}ms`, animationDuration: `${Math.max(.8, Math.min(5, reasoningMs / 1000 / Math.max(1, latest.laws.length)))}s` }}>
+                    <span className="rocket" aria-hidden="true">🚀</span><span className="flight-line" /><span className="star" aria-hidden="true">✦</span><span className="treaty-node">{law}</span>
+                  </div>
+                ))}
+              </div>}
+            </div>}
+
+          {!exploring && latest && latest.countries.length > 0 && <div className="jurisdictions" aria-label="Country positions found by the agent">
+            <span className="jurisdictions-label">jurisdictions reached</span>
+            <div className="flags">
+              {latest.countries.map((c, i) => <div className={`flag ${c.stance}`} key={c.name} title={c.why} style={{ animationDelay: `${latest.laws.length * 180 + i * 70}ms` }}><span className="em">{flag(c.name)}</span><span>{c.name}</span><span className="st">{c.stance}</span></div>)}
+            </div>
+          </div>}
         </section>
       </div>
     </>
