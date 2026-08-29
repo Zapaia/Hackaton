@@ -1,0 +1,5 @@
+Registra todo lo que fuimos haciendo en la carpeta y entire. voy a seguir con otro agente
+
+---
+
+el codigo pusheado es el final por el momento. necesito preparar la entrega final, debe ser en un link publico, podemos reusar www.ramirozapaia.com que es donde esta mi pagina y ponerle el sulink /mooneto pero tene en cuenta que el codigo debe quedar en su repo, solo es para tenerlo levantado ahi.
