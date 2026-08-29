@@ -1,0 +1,6 @@
+Bien. retorno ahora con nuevos limites de la sesion para poder continuar con vos. codex tiene muchos problemas para mejorar todo. me quede corto. 
+usa impecable para mejorar toda la ui. ademas, se supone que el agente creado usa fal para generar un video pero generalmente no aparece, ese video tiene que aparecer. mejoralo en el trabajo de ui.
+
+---
+
+Intentar nuevamente
