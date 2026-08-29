@@ -1,0 +1,198 @@
+osea volvamos a lo que funcionaba bien al principio, ahora la mas simple pasa esto:
+
+Mooneto
+Space law, sourced. What is settled, what is disputed, and where it is written.
+Ask
+Can I own a plot of land on the Moon?
+Depends on jurisdiction
+The corpus does not clearly establish that a private person can legally own lunar land; it clearly bars national appropriation and clearly allows U.S. ownership of extracted lunar resources, so lunar land ownership remains unresolved here.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+3 claims rest on this provision
+Moon Agreement1979
+Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing
+1 claim rests on this provision
+Who reads it how
+1 allow0 reject
+
+* 🇺🇸United StatesU.S. law permits ownership of extracted lunar resources.
+* 🇱🇺LuxembourgNamed only; no stance in corpus.
+* 🇷🇺Russian FederationNamed only; no stance in corpus.
+* 🇨🇳ChinaNamed only; no stance in corpus.
+* 🇦🇺AustraliaNamed only; no stance in corpus.
+* 🇦🇹AustriaNamed only; no stance in corpus.
+* 🇧🇪BelgiumNamed only; no stance in corpus.
+* 🇨🇱ChileNamed only; no stance in corpus.
+* 🇰🇿KazakhstanNamed only; no stance in corpus.
+* 🇲🇦MoroccoNamed only; no stance in corpus.
+* 🇳🇱NetherlandsNamed only; no stance in corpus.
+* 🌍PakistanNamed only; no stance in corpus.
+* 🇵🇪PeruNamed only; no stance in corpus.
+* 🇵🇭PhilippinesNamed only; no stance in corpus.
+* 🇸🇦Saudi ArabiaNamed only; no stance in corpus.
+* 🌍UruguayNamed only; no stance in corpus.
+* 🌍Venezuela, Bolivarian Republic ofNamed only; no stance in corpus.
+
+---
+
+no me podes traer la version que andaba bien, en vez de seguir haciendo cambios?
+
+---
+
+<task-notification>
+<task-id>bv44q7n27</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-ramiro-Ramiro-03-Areas-hackathon-techeurope-cala-lockin-ago26-proyecto-hackaton/3c852e0b-00d6-4630-9543-bb6dc2d58770/tasks/bv44q7n27.output</output-file>
+<status>completed</status>
+<summary>Background command "Retry verification of restored version" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Mooneto
+Space law, sourced. What is settled, what is disputed, and where it is written.
+Ask
+Can I own a plot of land on the Moon?
+Prohibited
+Individuals cannot own land on the Moon under current space law.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+2 claims rest on this provision
+Moon Agreement1979
+Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing
+2 claims rest on this provision
+Who reads it how
+1 allow0 reject
+
+* 🇺🇸United StatesU.S. law permits ownership of extracted lunar resources.
+* 🇷🇺Russian FederationNo specific position on lunar land ownership stated.
+* 🇨🇳ChinaNo specific position on lunar land ownership stated.
+
+algo sigue andando mal, volve a previa
+
+---
+
+nono no anda diretamente, pone la que andaba y corregi los errores, sino no llegamos
+
+---
+
+no pero quiero la version ultima que probamos que andaba bien. con lo de space law was written in blabla
+
+---
+
+Ask about doing business in space
+Ask
+Can I own a plot of land on the Moon?
+Prohibited
+Individuals cannot own land on the Moon under current space law.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+2 claims rest on this provision
+Moon Agreement1979
+Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing
+2 claims rest on this provision
+Who reads it how
+1 allow0 reject
+
+* 🇺🇸United StatesU.S. law permits ownership of extracted lunar resources.
+* 🇷🇺Russian FederationNo specific position on lunar land ownership stated.
+* 🇨🇳ChinaNo specific position on lunar land ownership stated.
+
+---
+
+esta mal eso
+
+---
+
+no tiene sentido lo que responde con la pregunta, responde cosas diferentes
+
+---
+
+que pruebo?
+
+---
+
+en donde?
+
+---
+
+no me abre
+
+---
+
+para la pregunta del video va a andar bien?
+
+---
+
+podes dejar la pregunta que voy a hacer en el video precargada? como para que "cargue" 15 segundos y luego se muestre?
+
+---
+
+<task-notification>
+<task-id>b2171fnzv</task-id>
+<tool-use-id>toolu_01JKBxtW1VL212F336fEdUpu</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-ramiro-Ramiro-03-Areas-hackathon-techeurope-cala-lockin-ago26-proyecto-hackaton/3c852e0b-00d6-4630-9543-bb6dc2d58770/tasks/b2171fnzv.output</output-file>
+<status>completed</status>
+<summary>Background command "Pre-warm the demo question and its video" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+el video que tarde 5 segundos en aparecer, antes de eso la animacion de carga hasta el video sino parece instantaneo
+
+---
+
+la respuesta no aparece a los 15
+
+---
+
+estados unidos si y no aparece:
+
+Can we extract resources from the Moon, and own them?
+Depends on jurisdiction
+Current space law does not clearly permit ownership of lunar resources.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+2 claims rest on this provision
+Moon Agreement1979
+Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing
+3 claims rest on this provision
+U.S. Commercial Space Launch Competitiveness Act2015
+Grants U.S. citizens and companies the right to own, transport, use, and sell resources extracted from asteroids and the Moon; permits asteroid mining companies to keep resources they have collected; extends learning period for regulation of private-sector spaceships until 2023; continues International Space Station operation until at least 2024; continues indemnification of commercial space launches until 2025
+2 claims rest on this provision
+Artemis Accords2020
+Resource extraction does not inherently constitute national appropriation under the Outer Space Treaty; Support for deconfliction through coordination and public information; Heritage site protections for lunar landing locations
+2 claims rest on this provision
+Who reads it how
+1 allow11 reject
+
+* 🇱🇺LuxembourgPermits ownership of extracted resources.
+* 🇷🇺Russian FederationOpposes U.S. position on resource extraction.
+* 🇨🇳ChinaCriticizes U.S. approach as illegal.
+* 🇩🇪GermanyFavors multilateral negotiations over U.S. approach.
+* 🇫🇷FranceSupports multilateral discussions on space resources.
+* 🇦🇹AustriaConcerns about developed states' resource extraction.
+* 🇧🇪BelgiumOpposes unilateral extraction by developed nations.
+* 🇨🇱ChileConcerned about equity in resource extraction.
+* 🇲🇽MexicoOpposes privatization of lunar resources.
+* 🇳🇱NetherlandsSupports equitable sharing of lunar resources.
+* 🌍PakistanOpposes developed states' resource claims.
+* 🇵🇭PhilippinesConcerned about fairness in resource extraction.
+
+---
+
+si
+
+---
+
+<task-notification>
+<task-id>bfqgevyag</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-ramiro-Ramiro-03-Areas-hackathon-techeurope-cala-lockin-ago26-proyecto-hackaton/3c852e0b-00d6-4630-9543-bb6dc2d58770/tasks/bfqgevyag.output</output-file>
+<status>completed</status>
+<summary>Background command "Rewarm demo question with the enacting-state fix" completed (exit code 0)</summary>
+</task-notification>
