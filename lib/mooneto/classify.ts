@@ -22,10 +22,15 @@ Set "provision" to the index of the corpus provision that carries the claim, or 
 the label is "unsupported". A claim labelled settled or disputed MUST cite a provision.
 
 Also, for every country named in the material, give its stance on the specific
-activity the user asked about:
-  "enables" - its national law or signed position permits it
-  "rejects" - it opposes that reading
-  "unclear" - named but position not established by the material
+activity the user asked about. **Default to "unclear".** A state only leaves "unclear"
+when the corpus or the claims actually say what that state does:
+  "enables" - a named statute or signed instrument of THAT state permits it
+  "rejects" - THAT state is recorded as opposing this reading
+  "unclear" - anything else, including a state merely named in passing
+
+Being party to a general treaty is not by itself a rejection of the activity. If your
+"why" for a state would say that its position is not established, its stance is
+"unclear", never "rejects".
 
 Return ONLY JSON:
 {"claims":[{"index":0,"label":"settled","provision":0,"why":"<max 12 words>"}],
@@ -113,7 +118,17 @@ export async function analyse(found: CalaResult, corpus: Provision[] = []): Prom
     verdict: verdict.verdict ?? "",
     tone: verdict.tone ?? "split",
     claims,
-    countries: verdict.countries ?? [],
+    // Enforced in code, because the model kept returning "rejects" while writing a
+    // reason that said the position was not established. A tool that reports ten
+    // rejections it cannot evidence is worse than one that admits it does not know.
+    countries: (verdict.countries ?? []).map((country: CountryStance) => {
+      const unevidenced = /not (established|specified|stated|determined|found)|no (clear |explicit )?position|unknown|unclear/i
+      const stance: Stance =
+        country.stance !== "unclear" && unevidenced.test(country.why ?? "")
+          ? "unclear"
+          : country.stance
+      return { ...country, stance }
+    }),
     laws,
   }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { generateCartoonActivity } from "@/lib/mooneto/fal"
 import { read, write } from "@/lib/mooneto/cache"
-import { scenePrompt } from "@/lib/mooneto/scene"
+import { describeScene } from "@/lib/mooneto/scene"
 
 export const runtime = "nodejs"
 export const maxDuration = 300
@@ -25,7 +25,8 @@ export async function POST(request: Request) {
     if (cached) return NextResponse.json({ ...cached, cached: true })
 
     const started = Date.now()
-    const url = await generateCartoonActivity(scenePrompt(asked), { duration: 5 })
+    const prompt = await describeScene(asked)
+    const url = await generateCartoonActivity(prompt, { duration: 5 })
     console.log(`[video] generated in ${((Date.now() - started) / 1000).toFixed(1)}s`)
 
     await write(`video:${asked}`, [], { url })

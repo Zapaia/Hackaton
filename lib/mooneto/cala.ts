@@ -90,3 +90,22 @@ export async function opposition(question: string): Promise<CalaResult | null> {
     return null
   }
 }
+
+/**
+ * Jurisdiction sweep.
+ *
+ * The main query names whichever states its sources happened to mention, which for a
+ * narrow question is often one or two. Asking directly which states have legislated on
+ * the activity is the honest way to widen the map — the alternative, letting the model
+ * fill the gaps, produced ten rejections it could not evidence.
+ */
+export async function jurisdictions(question: string): Promise<CalaResult | null> {
+  try {
+    return await ask(
+      `Which countries have national space legislation, signed accords or a stated official position on this, and what does each one say? ${question}`
+    )
+  } catch (error) {
+    console.warn("[cala] jurisdiction sweep failed:", error)
+    return null
+  }
+}
