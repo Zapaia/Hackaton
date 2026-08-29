@@ -1,0 +1,13 @@
+no hardcodees cosas, el agente tiene que ser capaz de interpretar preguntas diferentes, buscar en cala y ahi dar la repsuesta
+
+---
+
+abrime pagina
+
+---
+
+no anda
+
+---
+
+bien, abri la skill de impecable para la ui. mejora todo lo de mostrar que paises supportean, los tratados, como y demas. tiene que mejorar mucho la ui
