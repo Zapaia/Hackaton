@@ -213,53 +213,47 @@ export default function Mooneto() {
         </section>
 
         <section className="stage">
-          {miningScene ? (
-            <div className="mining-scene" aria-label="Illustrative lunar mining activity">
-              <span className="earth" />
-              <span className="terrain" />
-              <span className="dust dust-one" />
-              <span className="dust dust-two" />
-              <div className="rover">
-                <span className="mast" />
-                <span className="cab" />
-                <span className="arm"><span className="scoop" /></span>
-                <span className="wheel wheel-one" />
-                <span className="wheel wheel-two" />
+          <div className={`case-visual${latest ? " active" : ""}`}>
+            <div className="moon-origin">
+              <div className="moon">
+                {miningScene && <span className="moon-rover">▰</span>}
               </div>
+              <span className="origin-label">the Moon</span>
             </div>
-          ) : (
-            <div className="moon" />
-          )}
 
-          {latest && (
-            <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>
-          )}
+            {latest && (
+              <div className="evidence-route" aria-label="Legal route found by the agent">
+                <span className="route-label">instruments found</span>
+                {latest.laws.map((law, i) => (
+                  <div className="treaty-flight" key={law} style={{ animationDelay: `${i * 180}ms` }}>
+                    <span className="rocket" aria-hidden="true">🚀</span>
+                    <span className="flight-line" />
+                    <span className="treaty-node">{law}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-          {latest && latest.laws.length > 0 && (
-            <div className="laws">
-              {latest.laws.map((law, i) => (
-                <div className="law" key={law} style={{ animationDelay: `${i * 90}ms` }}>
-                  <span className="ico">📜</span>
-                  <span className="name">{law}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          {latest && <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>}
 
           {latest && latest.countries.length > 0 && (
-            <div className="flags">
-              {latest.countries.map((c, i) => (
-                <div
-                  className={`flag ${c.stance}`}
-                  key={c.name}
-                  title={c.why}
-                  style={{ animationDelay: `${i * 70}ms` }}
-                >
-                  <span className="em">{flag(c.name)}</span>
-                  <span>{c.name}</span>
-                  <span className="st">{c.stance}</span>
-                </div>
-              ))}
+            <div className="jurisdictions" aria-label="Country positions found by the agent">
+              <span className="jurisdictions-label">jurisdictions reached</span>
+              <div className="flags">
+                {latest.countries.map((c, i) => (
+                  <div
+                    className={`flag ${c.stance}`}
+                    key={c.name}
+                    title={c.why}
+                    style={{ animationDelay: `${latest.laws.length * 180 + i * 70}ms` }}
+                  >
+                    <span className="em">{flag(c.name)}</span>
+                    <span>{c.name}</span>
+                    <span className="st">{c.stance}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </section>

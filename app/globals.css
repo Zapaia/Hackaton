@@ -71,7 +71,11 @@ form button{background:var(--settled); color:#04120c; border:0; border-radius:9p
 form button:disabled{opacity:.4; cursor:wait}
 
 .stage{position:relative; display:flex; flex-direction:column; align-items:center;
-       justify-content:center; gap:26px; padding:40px; overflow-y:auto}
+       justify-content:center; gap:18px; padding:40px; overflow-y:auto}
+.case-visual{width:min(700px,100%); min-height:210px; display:flex; align-items:center; gap:28px;
+  padding:18px 20px; border:1px solid var(--line); border-radius:18px; background:rgba(5,6,13,.42)}
+.moon-origin{width:200px; flex:none; display:flex; flex-direction:column; align-items:center; gap:7px}
+.origin-label,.route-label,.jurisdictions-label{color:var(--dim); font-size:10px; text-transform:uppercase; letter-spacing:.1em}
 .moon{width:190px; height:190px; border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#cfd4e0 0%,#9aa1b4 45%,#5a6076 78%,#33384a 100%);
   box-shadow:0 0 90px rgba(180,195,235,.22), inset -16px -12px 44px rgba(0,0,0,.55);
@@ -83,25 +87,13 @@ form button:disabled{opacity:.4; cursor:wait}
     radial-gradient(7px 7px at 47% 71%,#6a7086,transparent),
     radial-gradient(5px 5px at 72% 26%,#6a7086,transparent)}
 .busy .moon{transform:scale(.93)}
-.mining-scene{width:270px; height:170px; position:relative; overflow:hidden; border-radius:24px;
-  border:1px solid var(--line); background:linear-gradient(#070a15 0 55%,#242938 56%,#10131e 100%);
-  box-shadow:0 0 70px rgba(180,195,235,.16); flex:none}
-.mining-scene .earth{position:absolute; width:34px; height:34px; right:34px; top:23px; border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#d7f2ff 0 8%,#4fa7d7 29%,#203c88 62%,#10163d 100%);
-  box-shadow:0 0 18px #4fa7d7}
-.terrain{position:absolute; left:-10%; right:-10%; bottom:-22px; height:86px; border-radius:50% 50% 0 0;
-  background:radial-gradient(ellipse at 52% 7%,#777e90 0 8%,transparent 9%),linear-gradient(#777e90,#3e4454 58%,#282d3a)}
-.rover{position:absolute; left:64px; bottom:42px; width:81px; height:47px; animation:rover-work 5s ease-in-out infinite}
-.rover .cab{position:absolute; left:29px; top:6px; width:39px; height:22px; border:3px solid #c9d1e6; border-radius:7px 9px 4px 4px; background:#33445a}
-.rover .mast{position:absolute; left:42px; top:-9px; width:3px; height:17px; background:#c9d1e6}.rover .mast::after{content:""; position:absolute; width:8px; height:8px; left:-3px; top:-3px; border-radius:50%; background:var(--settled); box-shadow:0 0 10px var(--settled)}
-.rover .arm{position:absolute; left:3px; top:25px; width:33px; height:5px; border-radius:6px; background:#c9d1e6; transform-origin:29px center; animation:dig 2.5s ease-in-out infinite}
-.rover .scoop{position:absolute; left:-8px; top:2px; width:13px; height:10px; border:3px solid #c9d1e6; border-top:0; border-radius:0 0 8px 8px}
-.wheel{position:absolute; bottom:0; width:18px; height:18px; border:4px solid #171b29; border-radius:50%; background:#7c8495; animation:wheel-turn 5s linear infinite}.wheel-one{left:29px}.wheel-two{right:2px}
-.dust{position:absolute; left:45px; bottom:50px; width:8px; height:8px; border-radius:50%; background:#b3bac8; opacity:0; animation:dust-puff 2.5s ease-out infinite}.dust-two{animation-delay:1.25s}
-@keyframes rover-work{0%,100%{transform:translateX(0)}50%{transform:translateX(74px)}}
-@keyframes dig{0%,25%,100%{transform:rotate(5deg)}50%,75%{transform:rotate(35deg)}}
-@keyframes wheel-turn{to{transform:rotate(360deg)}}
-@keyframes dust-puff{25%{opacity:.8;transform:translate(0,0) scale(.6)}75%{opacity:0;transform:translate(-18px,-15px) scale(2)}}
+.moon-rover{position:absolute; left:42%; bottom:22%; color:var(--ink); font-size:19px; text-shadow:0 1px 4px #000; animation:rover-cross 4s ease-in-out infinite}
+.evidence-route{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px}
+.treaty-flight{display:flex; align-items:center; min-width:0; opacity:0; animation:flight-in .55s ease forwards}
+.rocket{font-size:15px; transform:rotate(45deg); animation:launch .7s ease-out both}
+.flight-line{height:1px; flex:1; min-width:18px; margin:0 8px; background:linear-gradient(90deg,var(--settled),var(--line)); transform-origin:left; animation:line-grow .45s ease both}
+.treaty-node{max-width:180px; border:1px solid rgba(49,196,141,.55); border-radius:14px; padding:5px 9px; background:#0a1514; color:var(--ink); font-size:11px; line-height:1.2}
+@keyframes flight-in{to{opacity:1}}@keyframes launch{from{opacity:0;transform:translateX(-20px) rotate(45deg)}to{opacity:1;transform:none}}@keyframes line-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes rover-cross{0%,100%{transform:translateX(-10px)}50%{transform:translateX(18px)}}
 
 .verdict{max-width:600px; text-align:center; font-size:19px; line-height:1.45;
          letter-spacing:-.01em}
@@ -109,12 +101,8 @@ form button:disabled{opacity:.4; cursor:wait}
 .verdict.split{color:var(--disputed)}
 .verdict.yes{color:var(--settled)}
 
-.laws{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:780px}
-.law{width:136px; padding:14px 12px; border:1px solid var(--line); border-radius:11px;
-  background:linear-gradient(#111527,#0a0d18); text-align:center; animation:rise .45s ease backwards}
-.law .ico{font-size:24px; display:block; margin-bottom:7px}
-.law .name{font-size:12px; line-height:1.35; color:#c9d1e6}
-
+.jurisdictions{width:min(700px,100%); border-top:1px solid var(--line); padding-top:12px}
+.jurisdictions-label{display:block; margin-bottom:8px; text-align:center}
 .flags{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:840px}
 .flag{display:flex; align-items:center; gap:8px; padding:8px 13px; border-radius:22px;
   border:1px solid var(--line); background:#0a0d18; font-size:13px;
