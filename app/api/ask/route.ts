@@ -21,7 +21,9 @@ export async function POST(request: Request) {
 
     // Check the cache before the rewrite: the rewrite itself costs a model call.
     const cached = await read<Answer>(asked, history)
-    if (cached) {
+    // Do not preserve an old empty retrieval forever. A cached answer without any
+    // instrument should be retried so the interpreter and Cala can recover it.
+    if (cached && cached.laws?.length > 0) {
       console.log(`[mooneto] cache hit (${Date.now() - started}ms)`)
       return NextResponse.json({ ...cached, asked, cached: true })
     }
@@ -39,7 +41,8 @@ export async function POST(request: Request) {
     }
 
     // The legal corpus: the articulated provisions of every instrument Cala named.
-    // Claims are judged against this and nothing else.
+    // The committed core is always available inside corpus(); Cala still decides
+    // which instruments are relevant to this question.
     const provisions = await corpus(found.laws)
     console.log(`[mooneto] corpus: ${provisions.length} provision(s) from ${found.laws.length} law(s)`)
 

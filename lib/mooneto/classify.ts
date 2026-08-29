@@ -95,19 +95,25 @@ export async function analyse(found: CalaResult, corpus: Provision[] = []): Prom
     ])
   )
 
+  const claims = found.claims.map((c, i) => {
+    const verdictFor = labels.get(i)
+    const cited =
+      typeof verdictFor?.provision === "number" ? corpus[verdictFor.provision] : null
+    // Enforced in code, not left to the prompt: no provision, no standing.
+    const label: Label = cited ? verdictFor!.label : "unsupported"
+    return { ...c, label, why: verdictFor?.why ?? "", provision: cited ?? null }
+  })
+  const laws = [...new Set([
+    ...found.laws,
+    ...claims.flatMap((claim) => claim.provision?.law ? [claim.provision.law] : []),
+  ])]
+
   return {
     question: found.question,
     verdict: verdict.verdict ?? "",
     tone: verdict.tone ?? "split",
-    claims: found.claims.map((c, i) => {
-      const verdictFor = labels.get(i)
-      const cited =
-        typeof verdictFor?.provision === "number" ? corpus[verdictFor.provision] : null
-      // Enforced in code, not left to the prompt: no provision, no standing.
-      const label: Label = cited ? verdictFor!.label : "unsupported"
-      return { ...c, label, why: verdictFor?.why ?? "", provision: cited ?? null }
-    }),
+    claims,
     countries: verdict.countries ?? [],
-    laws: found.laws,
+    laws,
   }
 }

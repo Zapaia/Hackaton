@@ -8,17 +8,17 @@
 
 const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-mini"
 
-const SYSTEM = `Rewrite the user's latest question so it stands alone, resolving every
-pronoun and reference against the conversation. Keep it in the user's language and
-keep it short. Preserve the legal subject matter exactly — never broaden or narrow it.
-
-If the question already stands alone, return it unchanged.
+const SYSTEM = `Rewrite the user's latest question into a precise, standalone research
+question for a space-law knowledge search. Resolve pronouns and references against the
+conversation when present. Interpret colloquial grammar and implied context, but preserve
+the exact activity, object, location, and requested scope — never invent a new fact.
+When the user asks whether an activity is "possible" or "can" be done in this legal
+advisor, phrase the question so Cala can retrieve the governing treaties and statutes
+as well as practical context. Keep it in the user's language and keep it short.
 
 Return ONLY JSON: {"question":"<rewritten question>"}`
 
 export async function standalone(question: string, history: string[]): Promise<string> {
-  if (history.length === 0) return question
-
   const key = process.env.OPENAI_API_KEY
   if (!key) throw new Error("OPENAI_API_KEY is not set")
 
