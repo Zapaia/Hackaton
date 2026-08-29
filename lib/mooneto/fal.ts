@@ -25,15 +25,20 @@ export async function generateIllustration(prompt: string): Promise<string> {
 }
 
 /** Generate a short, purely illustrative cartoon scene; legal facts stay in the UI. */
-export async function generateCartoonActivity(prompt: string): Promise<string> {
+export async function generateCartoonActivity(
+  prompt: string,
+  options: { duration?: number } = {},
+): Promise<string> {
   const key = process.env.FAL_KEY
   if (!key) throw new Error("FAL_KEY is not set")
 
   fal.config({ credentials: key })
+  // H3 Max currently accepts a 5–15 second duration range.
+  const duration = Math.max(5, Math.min(15, Math.round(options.duration ?? 5)))
   const result = await fal.subscribe(H3_VIDEO_MODEL, {
     input: {
       prompt,
-      duration: 5,
+      duration,
       resolution: "480P",
       aspect_ratio: "16:9",
       prompt_expansion_mode: "balanced",
