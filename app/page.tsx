@@ -71,10 +71,17 @@ export default function Mooneto() {
       const history = thread.flatMap((t) =>
         t.a ? [`Q: ${t.q}`, `A: ${t.a.verdict}`] : []
       )
+      // The case file so far. A business-case memo has to be built from everything the
+      // conversation established, not just from the last question.
+      const answered = thread.flatMap((t) => (t.a ? [t.a] : []))
+      const gathered = {
+        countries: answered.flatMap((a) => a.countries),
+        laws: [...new Set(answered.flatMap((a) => a.laws))],
+      }
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history }),
+        body: JSON.stringify({ question, history, gathered }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "request failed")
