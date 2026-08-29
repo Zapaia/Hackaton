@@ -1,0 +1,22 @@
+desacelera una banda. son las 14, tenemos hasta las 19. hay que mejorar el producto. decime en que estamos y poneme al dia
+
+---
+
+porque las fuentes son blogs? no estamos usando cala como base de datos? basicamente cala es la base de datos para agente.
+
+2. la visual es mejorable mucisimo, vamos a eso mas adelante.
+3. afirmaciones en chat no son lo principal, podemos ofrecerlo como opcional, pero la idea es que la herramienta sea visual
+
+lo demas es mas adelante
+
+---
+
+no entiendo, cual es el problema y que mejorar. la idea es tomar de cala solo lo fiable y lo jurisdiccional, un abogado se basa en eso, no lo que dice un blog
+
+---
+
+no, no podemos usar informacion de blogs y decir lo saco de un tratado. nuestra base se restringe a articulos legales.
+
+---
+
+para aca, registra y dame el prompt teniendo en uenta lo que rompiste, que lo arregle codex antes de seguir
