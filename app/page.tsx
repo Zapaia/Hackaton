@@ -73,6 +73,13 @@ const ISO: Record<string, string> = {
   Chile: "CL", Philippines: "PH", Peru: "PE", Morocco: "MA", Kazakhstan: "KZ",
 }
 
+/** The verdict's register follows its length, so the layout survives a wordy answer. */
+function verdictWeight(text: string): "tight" | "medium" | "long" {
+  const words = text.trim().split(/\s+/).length
+  if (words <= 10) return "tight"
+  return words <= 20 ? "medium" : "long"
+}
+
 function flag(name: string) {
   const code = ISO[name]
   if (!code) return "\u{1F30D}"
@@ -426,7 +433,10 @@ export default function Mooneto() {
               {latest && !busy && (
                 <>
                   <p className={`tone ${latest.tone}`}>{TONE_LABEL[latest.tone]}</p>
-                  <p className="verdict">{latest.verdict}</p>
+                  {/* Sized by how much there is to say. A seven-word verdict deserves the
+                      display size; a twenty-five word one at that size eats the viewport
+                      and pushes the law itself below the fold. */}
+                  <p className={`verdict ${verdictWeight(latest.verdict)}`}>{latest.verdict}</p>
                   {latest.resolved && latest.resolved !== latest.question && (
                     <p className="reading">Read as “{latest.resolved}”</p>
                   )}

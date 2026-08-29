@@ -202,8 +202,8 @@ h1, h2, h3 { font-weight: 600; line-height: 1.18; text-wrap: balance; }
 
 .stage {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  gap: var(--gap-lg);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--gap-xl);
   align-items: center;
 }
 
@@ -358,11 +358,26 @@ h1, h2, h3 { font-weight: 600; line-height: 1.18; text-wrap: balance; }
 .tone.split { color: var(--open); }
 
 .verdict {
-  font-size: var(--step-6);
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-  max-width: 20ch;
+  letter-spacing: -0.03em;
+  line-height: 1.14;
+  text-wrap: pretty;
+}
+.verdict.tight {
+  font-size: clamp(2.25rem, 4.2vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  max-width: 18ch;
+}
+.verdict.medium {
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  max-width: 26ch;
+}
+.verdict.long {
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.32;
+  max-width: 40ch;
 }
 
 .reading { color: var(--ink-faint); font-size: var(--step-2); font-style: italic; }
