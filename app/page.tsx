@@ -30,6 +30,8 @@ const SUGGESTIONS = [
   "Build me the business case for a lunar mining company",
 ]
 
+const MINIMAX_VIDEO_SRC = "/illustrations/lunar-mining-h3-cartoon.mp4"
+
 const MOON_CRATERS = [
   { left: "20%", top: "25%", size: 18 }, { left: "59%", top: "20%", size: 29 },
   { left: "72%", top: "46%", size: 13 }, { left: "37%", top: "57%", size: 23 },
@@ -140,12 +142,14 @@ export default function Mooneto() {
   const [thinkingMs, setThinkingMs] = useState(0)
   const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
   const [journeyStep, setJourneyStep] = useState(0)
+  const [visualVideoFailed, setVisualVideoFailed] = useState(false)
   const bottom = useRef<HTMLDivElement>(null)
   const thinkingStarted = useRef(0)
   const miningScene = depictsMining(latest) || depictsMiningText(activeQuestion)
   const routeCount = latest?.laws.length ?? (exploring ? 6 : 0)
   const routePoints = makeRoutePoints(starField, routeCount)
   const currentTarget = routeTarget(journeyStep, routePoints)
+  const showMinimaxVideo = exploring && miningScene && !visualVideoFailed
 
   useEffect(() => {
     if (!exploring) return
@@ -180,6 +184,7 @@ export default function Mooneto() {
     thinkingStarted.current = Date.now()
     setThinkingMs(0)
     setJourneyStep(0)
+    setVisualVideoFailed(false)
     setStarField(makeStarField(`${question}:${Date.now()}`))
     setLatest(null)
     setInput("")
@@ -371,15 +376,24 @@ export default function Mooneto() {
           )}
 
           {exploring && (
-            <div className="exploration" aria-live="polite">
-              <div className="exploration-orbit">
-                <span className="orbit-ring" />
-                <svg className="journey-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d={routePath(routePoints)} /></svg>
-                {routePoints.map((point, i) => <span className="scout-star" key={i} style={{ left: `${point.left}%`, top: `${point.top}%`, animationDelay: `${i * 160}ms` }}>✦</span>)}
-                <div className="exploration-moon"><MoonMark mining={miningScene} /></div>
-                <span className="journey-rocket" style={{ left: `${currentTarget.left}%`, top: `${currentTarget.top}%` }}><RocketMark /></span>
-              </div>
-              <div className="exploration-caption" role="status"><span className="live-dot" /> <span>Tracing the legal constellation</span><time>{(thinkingMs / 1000).toFixed(1)}s</time></div>
+            <div className={`exploration${showMinimaxVideo ? " exploration-video-mode" : ""}`} aria-live="polite">
+              {showMinimaxVideo ? (
+                <div className="minimax-visual">
+                  <video className="exploration-video" src={MINIMAX_VIDEO_SRC} poster="/illustrations/lunar-mining.webp" autoPlay muted loop playsInline preload="auto" onError={() => setVisualVideoFailed(true)} aria-label="Cartoon lunar rover scooping lunar dust" />
+                  <div className="exploration-caption" role="status"><span className="live-dot" /> <span>Agent is thinking</span><time>{(thinkingMs / 1000).toFixed(1)}s</time></div>
+                </div>
+              ) : (
+                <>
+                  <div className="exploration-orbit">
+                    <span className="orbit-ring" />
+                    <svg className="journey-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d={routePath(routePoints)} /></svg>
+                    {routePoints.map((point, i) => <span className="scout-star" key={i} style={{ left: `${point.left}%`, top: `${point.top}%`, animationDelay: `${i * 160}ms` }}>✦</span>)}
+                    <div className="exploration-moon"><MoonMark mining={miningScene} /></div>
+                    <span className="journey-rocket" style={{ left: `${currentTarget.left}%`, top: `${currentTarget.top}%` }}><RocketMark /></span>
+                  </div>
+                  <div className="exploration-caption" role="status"><span className="live-dot" /> <span>Agent is thinking</span><time>{(thinkingMs / 1000).toFixed(1)}s</time></div>
+                </>
+              )}
             </div>
           )}
 
