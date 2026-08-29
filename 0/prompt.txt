@@ -1,0 +1,27 @@
+Can we extract materials from the Moon?
+Depends on jurisdiction
+Moon material extraction is not clearly prohibited across the corpus, but legality is unresolved internationally and expressly enabled in some national laws.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+2 claims rest on this provision
+Moon Agreement1979
+Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing
+1 claim rests on this provision
+U.S. Commercial Space Launch Competitiveness Act2015
+Grants U.S. citizens and companies the right to own, transport, use, and sell resources extracted from asteroids and the Moon; permits asteroid mining companies to keep resources they have collected; extends learning period for regulation of private-sector spaceships until 2023; continues International Space Station operation until at least 2024; continues indemnification of commercial space launches until 2025
+1 claim rests on this provision
+Luxembourg's Space Resources Law2017
+The Luxembourg Space Resources Law (enacted 20 July 2017) establishes that: 1. Space resources (e.g., minerals, water) are capable of being owned, granting private companies property rights over resources they extract. 2. Ownership is recognized only after the entity obtains a specific authorization/licence from the competent minister for each exploration or utilization mission. 3. The law creates a licensing and supervision regime for space‑resource activities, separate from launch and registration rules. 4. It distinguishes between the appropriation of a celestial body (prohibited) and the appropriation of extracted material (permitted), aligning with the Outer Space Treaty. 5. It provides legal certainty for companies incorporated under Luxembourg law (or EU companies with a Luxembourg office) to claim ownership of extracted resources. 6. The framework includes provisions for liability, supervision, and tax incentives to attract space‑mining enterprises.
+1 claim rests on this provision
+Who reads it how
+2 allow0 reject
+
+* 🇺🇸United StatesU.S. statute grants rights over extracted lunar resources.
+* 🇱🇺LuxembourgLuxembourg law recognizes ownership of extracted resources.
+* 🇷🇺Russian FederationNo Russian legal position appears in the corpus.
+* 🇨🇳ChinaNo Chinese legal position appears in the corpus.
+* 🇯🇵JapanNo Japanese legal position appears in the corpus.
+* 🇦🇪United Arab EmiratesNo UAE legal position appears in the corpus.
+
+se rompe toda la visual, no se que paso o que hiciste. ahora todo es grande, tiene que ser mas amigable en UI, ataquemos esto, que es lo mas importante. rediseno
