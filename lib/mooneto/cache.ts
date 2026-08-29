@@ -12,21 +12,35 @@ import { join } from "path"
 
 const DIR = join(process.cwd(), ".cache", "answers")
 
-const keyFor = (question: string) =>
-  createHash("sha256").update(question.trim().toLowerCase()).digest("hex").slice(0, 32)
+/**
+ * Keyed on the question as the user typed it plus the thread so far — not on the
+ * rewritten question. The rewrite goes through a model and is not byte-stable even at
+ * temperature 0, so keying on it would miss on a replay of the very same script.
+ */
+const keyFor = (question: string, history: string[]) =>
+  createHash("sha256")
+    .update([question.trim().toLowerCase(), ...history].join("\n"))
+    .digest("hex")
+    .slice(0, 32)
 
-export async function read<T>(question: string): Promise<T | null> {
+export async function read<T>(question: string, history: string[] = []): Promise<T | null> {
   try {
-    return JSON.parse(await readFile(join(DIR, `${keyFor(question)}.json`), "utf8"))
+    const path = join(DIR, `${keyFor(question, history)}.json`)
+    return JSON.parse(await readFile(path, "utf8"))
   } catch {
     return null
   }
 }
 
-export async function write(question: string, value: unknown): Promise<void> {
+export async function write(
+  question: string,
+  history: string[],
+  value: unknown
+): Promise<void> {
   try {
     await mkdir(DIR, { recursive: true })
-    await writeFile(join(DIR, `${keyFor(question)}.json`), JSON.stringify(value, null, 2))
+    const path = join(DIR, `${keyFor(question, history)}.json`)
+    await writeFile(path, JSON.stringify(value, null, 2))
   } catch (error) {
     console.warn("[cache] could not persist:", error)
   }

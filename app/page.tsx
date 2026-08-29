@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 type Source = { name: string; url: string }
 type Claim = { text: string; sources: Source[]; label: string; why: string }
@@ -43,6 +43,11 @@ export default function Mooneto() {
   const [latest, setLatest] = useState<Answer | null>(null)
   const [input, setInput] = useState("")
   const [busy, setBusy] = useState(false)
+  const bottom = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth" })
+  }, [thread, busy])
 
   async function submit(question: string) {
     if (!question.trim() || busy) return
@@ -129,6 +134,7 @@ export default function Mooneto() {
               </div>
             ))}
             {busy && <div className="a">Consulting treaties…</div>}
+            <div ref={bottom} />
           </div>
 
           <form

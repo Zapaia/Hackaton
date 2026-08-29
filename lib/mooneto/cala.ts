@@ -71,3 +71,22 @@ export async function ask(question: string): Promise<CalaResult> {
     laws: namesOfType("Law"),
   }
 }
+
+/**
+ * Adversarial retrieval.
+ *
+ * A single query returns the framing of whoever wrote the sources, which for space
+ * resources skews toward the states that permit it. A legal tool must not inherit that
+ * bias, so we go looking for the opposing position explicitly and merge it in. This is
+ * what turns an all-green answer into an honest split.
+ */
+export async function opposition(question: string): Promise<CalaResult | null> {
+  try {
+    return await ask(
+      `Which states, treaties or legal scholars oppose or reject the following, and why? ${question}`
+    )
+  } catch (error) {
+    console.warn("[cala] opposition lookup failed:", error)
+    return null
+  }
+}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { ask } from "@/lib/mooneto/cala"
+import { ask, opposition } from "@/lib/mooneto/cala"
 import { analyse, type Answer } from "@/lib/mooneto/classify"
 import { standalone } from "@/lib/mooneto/rewrite"
 import { read, write } from "@/lib/mooneto/cache"
@@ -16,17 +16,28 @@ export async function POST(request: Request) {
     }
 
     const asked = question.trim()
+
+    // Check the cache before the rewrite: the rewrite itself costs a model call.
+    const cached = await read<Answer>(asked, history)
+    if (cached) {
+      console.log(`[mooneto] cache hit (${Date.now() - started}ms)`)
+      return NextResponse.json({ ...cached, asked, cached: true })
+    }
+
     const resolved = await standalone(asked, history)
     if (resolved !== asked) console.log(`[mooneto] rewrote -> ${resolved}`)
 
-    const cached = await read<Answer>(resolved)
-    if (cached) {
-      console.log(`[mooneto] cache hit (${Date.now() - started}ms)`)
-      return NextResponse.json({ ...cached, asked, resolved, cached: true })
+    // Ask the question, and in parallel ask who disagrees. Merging both keeps a
+    // one-sided source set from producing a falsely settled answer.
+    const [found, against] = await Promise.all([ask(resolved), opposition(resolved)])
+    if (against) {
+      found.claims.push(...against.claims)
+      found.countries = [...new Set([...found.countries, ...against.countries])]
+      found.laws = [...new Set([...found.laws, ...against.laws])]
     }
 
-    const answer = await analyse(await ask(resolved))
-    await write(resolved, answer)
+    const answer = { ...(await analyse(found)), resolved }
+    await write(asked, history, answer)
     console.log(`[mooneto] fresh (${Date.now() - started}ms)`)
     return NextResponse.json({ ...answer, asked, resolved, cached: false })
   } catch (error: any) {
