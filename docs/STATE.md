@@ -23,7 +23,18 @@ Red verdict, 5 settled claims with real source links, 2 treaty cards, US flag.
 
 ## Open work, in priority order
 
-### 1. Beat 3 does not do what it promises  ← most important
+### ~~1. Beat 3~~ — DONE
+
+Beat 3 now returns a decision memo: a verdict naming a country to incorporate in, a
+numbered route with the legal basis per step, open risks with their triggers, and three
+confidence components. The national-law and dissent lines are **derived from the country
+stances in the case file**, not written by the model — it was claiming no major power
+dissents while the findings listed Russia as rejecting.
+
+Verified in the browser: all three beats run end to end, and the flags render split
+(United States enables; Russia, China, India reject).
+
+### 1. Superseded — original note kept below for context
 "Build me the business case for a lunar mining company" currently returns another
 Q&A answer ("The legality of lunar mining is currently disputed among states").
 It does **not** build a business case.
