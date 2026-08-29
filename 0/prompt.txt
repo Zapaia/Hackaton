@@ -1,0 +1,51 @@
+si entro a entire y veo mis projects no esta este
+
+---
+
+antes de que sigas, como abro este proyecto en codex
+
+---
+
+Error: spawn /opt/homebrew/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/codex/codex ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:286:19)
+    at onErrorNT (node:internal/child_process:507:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'spawn /opt/homebrew/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/codex/codex',
+  path: '/opt/homebrew/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/codex/codex',
+  spawnargs: []
+}
+
+---
+
+│ directory: ~/Ramiro/03-Areas/…/proyecto/hackaton │
+╰──────────────────────────────────────────────────╯
+
+  Tip: Use /statusline to configure which items appear in the status line.
+
+⚠ Configured service tier `priority` is not advertised as supported for model `gpt-5.6-terra` and will be omitted from requests.
+ 
+ 
+  Hooks
+  Lifecycle hooks from config and enabled plugins.
+ 
+  Event                 Installed   Active      Description
+  PreToolUse            0           0           Before a tool executes
+  PermissionRequest     0           0           When permission is requested
+  PostToolUse           1           1           After a tool executes
+  PreCompact            0           0           Before context compaction
+  PostCompact           0           0           After context compaction
+  SessionStart          1           1           When a new session starts
+  SessionEnd            1           1           Right before a session ends
+  UserPromptSubmit      1           1           When the user submits a prompt
+  SubagentStart         1           1           When a subagent is created
+  SubagentStop          1           1           Right before a subagent ends its turn
+  Stop                  1           1           Right before Codex ends its turn
+  Interrupt             0           0           Right before an interrupted turn is aborted
+ 
+  Press enter to view hooks; esc to close
+
+---
+
+no para, con eso ya esta? en caso que te quedes sin token puedo seguir ahi? estas registrando todo? estas comittenado a entire para que tenga conocimiento? estas dejando roadmap para seguir con codex? queda menos de 20% de tu limite
