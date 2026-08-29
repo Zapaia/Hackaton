@@ -3,6 +3,7 @@ import { ask, opposition } from "@/lib/mooneto/cala"
 import { analyse, type Answer } from "@/lib/mooneto/classify"
 import { standalone } from "@/lib/mooneto/rewrite"
 import { read, write } from "@/lib/mooneto/cache"
+import { buildPlan, wantsPlan } from "@/lib/mooneto/plan"
 
 export const runtime = "nodejs"
 export const maxDuration = 120
@@ -36,7 +37,10 @@ export async function POST(request: Request) {
       found.laws = [...new Set([...found.laws, ...against.laws])]
     }
 
-    const answer = { ...(await analyse(found)), resolved }
+    const analysed = await analyse(found)
+    // A request for a decision gets a memo, not a claim list.
+    const plan = wantsPlan(asked) ? await buildPlan(asked, analysed) : null
+    const answer = { ...analysed, resolved, ...(plan ? { plan, verdict: plan.verdict } : {}) }
     await write(asked, history, answer)
     console.log(`[mooneto] fresh (${Date.now() - started}ms)`)
     return NextResponse.json({ ...answer, asked, resolved, cached: false })
