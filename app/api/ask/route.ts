@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { ask, opposition, jurisdictions } from "@/lib/mooneto/cala"
+import { ask, opposition } from "@/lib/mooneto/cala"
 import { analyse, type Answer } from "@/lib/mooneto/classify"
 import { standalone } from "@/lib/mooneto/rewrite"
 import { read, write } from "@/lib/mooneto/cache"
@@ -33,19 +33,11 @@ export async function POST(request: Request) {
 
     // Ask the question, and in parallel ask who disagrees. Merging both keeps a
     // one-sided source set from producing a falsely settled answer.
-    // Three passes, run together: the question itself, who disagrees with it, and which
-    // states have actually legislated. One pass alone inherits the framing of whatever
-    // sources it happened to hit.
-    const [found, against, states] = await Promise.all([
-      ask(resolved),
-      opposition(resolved),
-      jurisdictions(resolved),
-    ])
-    for (const extra of [against, states]) {
-      if (!extra) continue
-      found.claims.push(...extra.claims)
-      found.countries = [...new Set([...found.countries, ...extra.countries])]
-      found.laws = [...new Set([...found.laws, ...extra.laws])]
+    const [found, against] = await Promise.all([ask(resolved), opposition(resolved)])
+    if (against) {
+      found.claims.push(...against.claims)
+      found.countries = [...new Set([...found.countries, ...against.countries])]
+      found.laws = [...new Set([...found.laws, ...against.laws])]
     }
 
     // The legal corpus: the articulated provisions of every instrument Cala named.

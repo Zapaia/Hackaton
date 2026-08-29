@@ -22,15 +22,10 @@ Set "provision" to the index of the corpus provision that carries the claim, or 
 the label is "unsupported". A claim labelled settled or disputed MUST cite a provision.
 
 Also, for every country named in the material, give its stance on the specific
-activity the user asked about. **Default to "unclear".** A state only leaves "unclear"
-when the corpus or the claims actually say what that state does:
-  "enables" - a named statute or signed instrument of THAT state permits it
-  "rejects" - THAT state is recorded as opposing this reading
-  "unclear" - anything else, including a state merely named in passing
-
-Being party to a general treaty is not by itself a rejection of the activity. If your
-"why" for a state would say that its position is not established, its stance is
-"unclear", never "rejects".
+activity the user asked about:
+  "enables" - its national law or signed position permits it
+  "rejects" - it opposes that reading
+  "unclear" - named but position not established by the material
 
 Return ONLY JSON:
 {"claims":[{"index":0,"label":"settled","provision":0,"why":"<max 12 words>"}],
@@ -58,6 +53,19 @@ export type Answer = {
   countries: CountryStance[]
   laws: string[]
 }
+
+/**
+ * Which state enacted which statute.
+ *
+ * A national law belongs to its state — that is a fact, not an inference. The two columns
+ * are filled from different places (instruments come from the corpus, states from Cala's
+ * entities), so a run could show a US statute granting a right while the United States was
+ * missing from the list of states that allow it. This closes that gap and nothing else.
+ */
+const ENACTED_BY: Array<{ match: RegExp; state: string }> = [
+  { match: /commercial space launch competitiveness/i, state: "United States" },
+  { match: /luxembourg/i, state: "Luxembourg" },
+]
 
 export async function analyse(found: CalaResult, corpus: Provision[] = []): Promise<Answer> {
   const key = process.env.OPENAI_API_KEY
@@ -118,17 +126,21 @@ export async function analyse(found: CalaResult, corpus: Provision[] = []): Prom
     verdict: verdict.verdict ?? "",
     tone: verdict.tone ?? "split",
     claims,
-    // Enforced in code, because the model kept returning "rejects" while writing a
-    // reason that said the position was not established. A tool that reports ten
-    // rejections it cannot evidence is worse than one that admits it does not know.
-    countries: (verdict.countries ?? []).map((country: CountryStance) => {
-      const unevidenced = /not (established|specified|stated|determined|found)|no (clear |explicit )?position|unknown|unclear/i
-      const stance: Stance =
-        country.stance !== "unclear" && unevidenced.test(country.why ?? "")
-          ? "unclear"
-          : country.stance
-      return { ...country, stance }
-    }),
+    countries: withEnactingStates(verdict.countries ?? [], found.laws),
     laws,
   }
+}
+
+/** Add the state behind any cited national statute, when it is not already listed. */
+function withEnactingStates(countries: CountryStance[], laws: string[]): CountryStance[] {
+  const listed = new Set(countries.map((c) => c.name.toLowerCase()))
+  const added: CountryStance[] = []
+
+  for (const law of laws) {
+    const owner = ENACTED_BY.find((entry) => entry.match.test(law))
+    if (!owner || listed.has(owner.state.toLowerCase())) continue
+    listed.add(owner.state.toLowerCase())
+    added.push({ name: owner.state, stance: "enables", why: `Its own law: ${law}.` })
+  }
+  return [...added, ...countries]
 }

@@ -56,6 +56,25 @@ const WORKING_STEPS = [
   "Drawing the scene",
 ]
 
+/**
+ * Presentation only: hold the thinking state for at least this long.
+ *
+ * A warmed answer returns in milliseconds, which is great in the room and useless on
+ * camera — the whole route animation and the pipeline steps flash past. Setting this for
+ * a recording lets that beat play. Leave it at zero for a live demo, or every answer pays
+ * the delay for nothing.
+ */
+const MIN_THINKING_MS = Number(process.env.NEXT_PUBLIC_MIN_THINKING_MS ?? 0)
+
+/**
+ * The scene lands before the verdict, never at the same moment.
+ *
+ * A cached video pops in instantly and then the viewer waits, which reads as if nothing
+ * is happening. Holding the scene to a shorter beat than the answer gives the sequence a
+ * shape: the route runs, the scene arrives, then the law lands on top of it.
+ */
+const MIN_SCENE_MS = Number(process.env.NEXT_PUBLIC_MIN_SCENE_MS ?? 0)
+
 const TONE_LABEL: Record<Answer["tone"], string> = {
   no: "Prohibited",
   yes: "Permitted",
@@ -71,13 +90,6 @@ const ISO: Record<string, string> = {
   Mexico: "MX", Israel: "IL", "Saudi Arabia": "SA", Nigeria: "NG", Colombia: "CO",
   Spain: "ES", Argentina: "AR", Netherlands: "NL", Belgium: "BE", Austria: "AT",
   Chile: "CL", Philippines: "PH", Peru: "PE", Morocco: "MA", Kazakhstan: "KZ",
-}
-
-/** The verdict's register follows its length, so the layout survives a wordy answer. */
-function verdictWeight(text: string): "tight" | "medium" | "long" {
-  const words = text.trim().split(/\s+/).length
-  if (words <= 10) return "tight"
-  return words <= 20 ? "medium" : "long"
 }
 
 function flag(name: string) {
@@ -277,7 +289,9 @@ export default function Mooneto() {
       body: JSON.stringify({ question: asked }),
     })
       .then(readJson)
-      .then((data) => {
+      .then(async (data) => {
+        const held = MIN_SCENE_MS - (Date.now() - startedAt.current)
+        if (held > 0) await new Promise((resolve) => setTimeout(resolve, held))
         if (id !== requestId.current) return
         if (data.url) setVideoUrl(data.url)
       })
@@ -303,6 +317,8 @@ export default function Mooneto() {
         body: JSON.stringify({ question: asked, history, gathered }),
       })
       const data = await readJson(res)
+      const held = MIN_THINKING_MS - (Date.now() - startedAt.current)
+      if (held > 0) await new Promise((resolve) => setTimeout(resolve, held))
       if (id !== requestId.current) return
       setThread((t) => t.map((x, i) => (i === turn ? { ...x, a: data } : x)))
       setLatest(data)
@@ -433,10 +449,7 @@ export default function Mooneto() {
               {latest && !busy && (
                 <>
                   <p className={`tone ${latest.tone}`}>{TONE_LABEL[latest.tone]}</p>
-                  {/* Sized by how much there is to say. A seven-word verdict deserves the
-                      display size; a twenty-five word one at that size eats the viewport
-                      and pushes the law itself below the fold. */}
-                  <p className={`verdict ${verdictWeight(latest.verdict)}`}>{latest.verdict}</p>
+                  <p className="verdict">{latest.verdict}</p>
                   {latest.resolved && latest.resolved !== latest.question && (
                     <p className="reading">Read as “{latest.resolved}”</p>
                   )}
