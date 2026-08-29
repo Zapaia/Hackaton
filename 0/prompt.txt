@@ -1,0 +1,31 @@
+Space law, sourced. What is settled, what is disputed, and where it is written.
+Ask
+can I own a piece of mars?
+Prohibited
+You cannot legally own a piece of Mars.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+2 claims rest on this provision
+U.S. Commercial Space Launch Competitiveness Act2015
+Grants U.S. citizens and companies the right to own, transport, use, and sell resources extracted from asteroids and the Moon; permits asteroid mining companies to keep resources they have collected; extends learning period for regulation of private-sector spaceships until 2023; continues International Space Station operation until at least 2024; continues indemnification of commercial space launches until 2025
+1 claim rests on this provision
+Who reads it how
+0 allow10 reject
+
+* 🇺🇸United StatesU.S. law does not allow private land claims on Mars.
+* 🇷🇺Russian FederationPosition on private ownership not established in material.
+* 🇨🇳ChinaPosition on private ownership not established in material.
+* 🇬🇧United KingdomPosition on private ownership not established in material.
+* 🇫🇷FrancePosition on private ownership not established in material.
+* 🇩🇪GermanyPosition on private ownership not established in material.
+* 🇯🇵JapanPosition on private ownership not established in material.
+* 🇮🇳IndiaPosition on private ownership not established in material.
+* 🇱🇺LuxembourgPosition on private ownership not established in material.
+* 🇦🇪United Arab EmiratesPosition on private ownership not established in material.
+
+lo que aparece en video es generado como luna, porque es gris. ademas, se genera demasiado rapido, esta reusando respuestas?
+
+---
+
+pero porque usas listas exp reg, si lo que te digo es que generes los pedidos con la api.
