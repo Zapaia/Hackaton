@@ -47,12 +47,20 @@ function flag(name: string) {
   return String.fromCodePoint(...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65))
 }
 
+function depictsMining(answer: Answer | null) {
+  if (!answer) return false
+  return /\b(min(e|ing)|extract(ion|ed|ing)?|resources?)\b/i.test(
+    `${answer.question} ${answer.resolved ?? ""}`
+  )
+}
+
 export default function Mooneto() {
   const [thread, setThread] = useState<Array<{ q: string; a?: Answer; error?: string }>>([])
   const [latest, setLatest] = useState<Answer | null>(null)
   const [input, setInput] = useState("")
   const [busy, setBusy] = useState(false)
   const bottom = useRef<HTMLDivElement>(null)
+  const miningScene = depictsMining(latest)
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" })
@@ -205,7 +213,23 @@ export default function Mooneto() {
         </section>
 
         <section className="stage">
-          <div className="moon" />
+          {miningScene ? (
+            <div className="mining-scene" aria-label="Illustrative lunar mining activity">
+              <span className="earth" />
+              <span className="terrain" />
+              <span className="dust dust-one" />
+              <span className="dust dust-two" />
+              <div className="rover">
+                <span className="mast" />
+                <span className="cab" />
+                <span className="arm"><span className="scoop" /></span>
+                <span className="wheel wheel-one" />
+                <span className="wheel wheel-two" />
+              </div>
+            </div>
+          ) : (
+            <div className="moon" />
+          )}
 
           {latest && (
             <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>

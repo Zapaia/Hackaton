@@ -83,6 +83,25 @@ form button:disabled{opacity:.4; cursor:wait}
     radial-gradient(7px 7px at 47% 71%,#6a7086,transparent),
     radial-gradient(5px 5px at 72% 26%,#6a7086,transparent)}
 .busy .moon{transform:scale(.93)}
+.mining-scene{width:270px; height:170px; position:relative; overflow:hidden; border-radius:24px;
+  border:1px solid var(--line); background:linear-gradient(#070a15 0 55%,#242938 56%,#10131e 100%);
+  box-shadow:0 0 70px rgba(180,195,235,.16); flex:none}
+.mining-scene .earth{position:absolute; width:34px; height:34px; right:34px; top:23px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#d7f2ff 0 8%,#4fa7d7 29%,#203c88 62%,#10163d 100%);
+  box-shadow:0 0 18px #4fa7d7}
+.terrain{position:absolute; left:-10%; right:-10%; bottom:-22px; height:86px; border-radius:50% 50% 0 0;
+  background:radial-gradient(ellipse at 52% 7%,#777e90 0 8%,transparent 9%),linear-gradient(#777e90,#3e4454 58%,#282d3a)}
+.rover{position:absolute; left:64px; bottom:42px; width:81px; height:47px; animation:rover-work 5s ease-in-out infinite}
+.rover .cab{position:absolute; left:29px; top:6px; width:39px; height:22px; border:3px solid #c9d1e6; border-radius:7px 9px 4px 4px; background:#33445a}
+.rover .mast{position:absolute; left:42px; top:-9px; width:3px; height:17px; background:#c9d1e6}.rover .mast::after{content:""; position:absolute; width:8px; height:8px; left:-3px; top:-3px; border-radius:50%; background:var(--settled); box-shadow:0 0 10px var(--settled)}
+.rover .arm{position:absolute; left:3px; top:25px; width:33px; height:5px; border-radius:6px; background:#c9d1e6; transform-origin:29px center; animation:dig 2.5s ease-in-out infinite}
+.rover .scoop{position:absolute; left:-8px; top:2px; width:13px; height:10px; border:3px solid #c9d1e6; border-top:0; border-radius:0 0 8px 8px}
+.wheel{position:absolute; bottom:0; width:18px; height:18px; border:4px solid #171b29; border-radius:50%; background:#7c8495; animation:wheel-turn 5s linear infinite}.wheel-one{left:29px}.wheel-two{right:2px}
+.dust{position:absolute; left:45px; bottom:50px; width:8px; height:8px; border-radius:50%; background:#b3bac8; opacity:0; animation:dust-puff 2.5s ease-out infinite}.dust-two{animation-delay:1.25s}
+@keyframes rover-work{0%,100%{transform:translateX(0)}50%{transform:translateX(74px)}}
+@keyframes dig{0%,25%,100%{transform:rotate(5deg)}50%,75%{transform:rotate(35deg)}}
+@keyframes wheel-turn{to{transform:rotate(360deg)}}
+@keyframes dust-puff{25%{opacity:.8;transform:translate(0,0) scale(.6)}75%{opacity:0;transform:translate(-18px,-15px) scale(2)}}
 
 .verdict{max-width:600px; text-align:center; font-size:19px; line-height:1.45;
          letter-spacing:-.01em}
