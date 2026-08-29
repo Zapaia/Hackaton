@@ -1,1 +1,37 @@
 ese es el link q espero
+
+---
+
+listo, ahora me voy a grabar el video. vos prepara todo para entregar What needs to be submitted
+Project presentation
+→
+Record a 2-minute video demo (Loom or equivalent)
+→
+Detailed explanation of your solution
+→
+Live walkthrough of the key features
+Open source repository
+→
+Public GitHub repository with the full source code
+→
+Comprehensive README with setup & installation steps
+→
+Documentation of all APIs, frameworks & tools used
+→
+Enough technical docs for thorough jury evaluationWhat needs to be submitted
+Project presentation
+→
+Record a 2-minute video demo (Loom or equivalent)
+→
+Detailed explanation of your solution
+→
+Live walkthrough of the key features
+Open source repository
+→
+Public GitHub repository with the full source code
+→
+Comprehensive README with setup & installation steps
+→
+Documentation of all APIs, frameworks & tools used
+→
+Enough technical docs for thorough jury evaluation
