@@ -1,0 +1,1 @@
+ademas, en este momento el codigo que se genera para visualizacion se puede pisar entre si, una estrella arrbia de la luna, el cohete no tiene recorrido smooth ni va de la estrella a la luna y de ahi a otro lado
