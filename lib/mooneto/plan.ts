@@ -16,21 +16,20 @@ You are given the legal findings gathered so far in this conversation. Use ONLY 
 findings. Never introduce a treaty, statute or country that does not appear in them.
 
 Produce:
-- "verdict": one sentence naming the recommended COUNTRY to incorporate in, and why.
-  It must name a state (for example "Luxembourg" or "the United States"), never a treaty.
-  Treaties are not jurisdictions. If no country in the findings enables the activity,
-  say so plainly instead of naming one.
+- "verdict": a COMPLETE SENTENCE recommending a country to incorporate in and saying
+  why. It must name a state, never a treaty — treaties are not jurisdictions.
+  Good: "Incorporate in Luxembourg, whose 2017 law grants ownership of extracted
+  resources." Bad: "Luxembourg." Bad: "The Outer Space Treaty framework."
+  If no country in the findings enables the activity, say that plainly.
 - "route": 2-4 concrete steps the founder should take, in order. Each step names the
   legal instrument that makes it possible.
 - "risks": 2-4 open legal risks. Each names what is unresolved and what would change it.
-- "confidence": {"ratification":"...","nationalLaw":"...","dissent":"..."} — one short
-  line each on how widely the governing treaty is ratified, whether enabling national
-  law exists, and whether a major power dissents.
+- "ratification": one short line on how widely the governing treaty is ratified.
 
 Return ONLY JSON:
 {"verdict":"...","route":[{"step":"...","basis":"..."}],
  "risks":[{"risk":"...","trigger":"..."}],
- "confidence":{"ratification":"...","nationalLaw":"...","dissent":"..."}}`
+ "ratification":"..."}`
 
 export type Plan = {
   verdict: string
@@ -75,7 +74,28 @@ export async function buildPlan(question: string, gathered: Answer): Promise<Pla
   }
 
   try {
-    return JSON.parse((await res.json()).choices[0].message.content)
+    const drafted = JSON.parse((await res.json()).choices[0].message.content)
+
+    // The two components we can derive, we derive. Asking the model to summarise its own
+    // evidence produced a line claiming no major power dissents while the findings listed
+    // Russia as rejecting. A legal tool cannot contradict its own data.
+    const enabling = gathered.countries.filter((c) => c.stance === "enables")
+    const dissenting = gathered.countries.filter((c) => c.stance === "rejects")
+
+    return {
+      verdict: drafted.verdict ?? "",
+      route: drafted.route ?? [],
+      risks: drafted.risks ?? [],
+      confidence: {
+        ratification: drafted.ratification ?? "Not established by the sources.",
+        nationalLaw: enabling.length
+          ? `Enabling national law in ${enabling.map((c) => c.name).join(", ")}.`
+          : "No enabling national law found in the sources.",
+        dissent: dissenting.length
+          ? `${dissenting.map((c) => c.name).join(", ")} reject this reading.`
+          : "No state in the sources is recorded as rejecting it.",
+      },
+    }
   } catch (error) {
     console.warn("[plan] could not parse plan:", error)
     return null

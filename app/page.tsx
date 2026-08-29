@@ -5,9 +5,18 @@ import { useEffect, useRef, useState } from "react"
 type Source = { name: string; url: string }
 type Claim = { text: string; sources: Source[]; label: string; why: string }
 type Country = { name: string; stance: string; why: string }
+type PlanStep = { step: string; basis: string }
+type PlanRisk = { risk: string; trigger: string }
+type Plan = {
+  verdict: string
+  route: PlanStep[]
+  risks: PlanRisk[]
+  confidence: { ratification: string; nationalLaw: string; dissent: string }
+}
 type Answer = {
   question: string
   resolved?: string
+  plan?: Plan
   verdict: string
   tone: string
   claims: Claim[]
@@ -113,7 +122,40 @@ export default function Mooneto() {
                     {turn.a.resolved && turn.a.resolved !== turn.q && (
                       <p className="resolved">interpreted as: “{turn.a.resolved}”</p>
                     )}
-                    {turn.a.claims.map((c, j) => (
+                    {turn.a.plan && (
+                      <div className="memo">
+                        <h3>Recommended route</h3>
+                        <ol>
+                          {turn.a.plan.route.map((r, j) => (
+                            <li key={j}>
+                              {r.step}
+                              <span className="basis">{r.basis}</span>
+                            </li>
+                          ))}
+                        </ol>
+
+                        <h3>Open risks</h3>
+                        <ul className="risks">
+                          {turn.a.plan.risks.map((r, j) => (
+                            <li key={j}>
+                              {r.risk}
+                              <span className="basis">changes if: {r.trigger}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <h3>Legal confidence</h3>
+                        <dl className="conf">
+                          <dt>Ratification</dt>
+                          <dd>{turn.a.plan.confidence.ratification}</dd>
+                          <dt>National law</dt>
+                          <dd>{turn.a.plan.confidence.nationalLaw}</dd>
+                          <dt>Major-power dissent</dt>
+                          <dd>{turn.a.plan.confidence.dissent}</dd>
+                        </dl>
+                      </div>
+                    )}
+                    {!turn.a.plan && turn.a.claims.map((c, j) => (
                       <div className="claim" key={j}>
                         <span className={`tag ${c.label}`}>{c.label}</span>
                         <p>{c.text}</p>
