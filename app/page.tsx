@@ -179,6 +179,7 @@ export default function Mooneto() {
     setExploring(true)
     thinkingStarted.current = Date.now()
     setThinkingMs(0)
+    setJourneyStep(0)
     setStarField(makeStarField(`${question}:${Date.now()}`))
     setLatest(null)
     setInput("")
