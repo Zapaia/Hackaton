@@ -82,7 +82,7 @@ form button:disabled{opacity:.4; cursor:wait}
 .visual-stars{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0}
 .visual-stars i{position:absolute; border-radius:50%; background:#fff; opacity:.28; animation:star-pulse 2.8s ease-in-out infinite alternate}
 .visual-stars i:nth-child(3n){background:#ffe7a1; opacity:.42}.visual-stars i:nth-child(5n){opacity:.16}
-.chat-toggle{position:absolute; z-index:3; top:20px; right:24px; border:1px solid var(--line); border-radius:20px;
+.chat-toggle{position:absolute; z-index:3; top:20px; left:24px; border:1px solid var(--line); border-radius:20px;
   background:rgba(12,15,28,.86); color:var(--ink); padding:8px 14px; font:inherit; font-size:12px; cursor:pointer;
   box-shadow:0 8px 24px rgba(0,0,0,.22)}
 .chat-toggle:hover{border-color:var(--settled); color:var(--settled)}
