@@ -1,0 +1,89 @@
+Read docs/STATE.md and docs/ROADMAP.md. Then run `entire checkpoint list` and
+`entire checkpoint explain <most recent id> --full` for the reasoning behind the
+latest work.
+
+Do ROADMAP items 0 and 1, in that order. Item 0 first — item 1 depends on it.
+
+ITEM 0 — the legal corpus must not be fetched at request time.
+A previous attempt loaded the six core instruments per request and tripped Cala's
+rate limit (HTTP 429). The corpus came back empty, and because the code requires a
+citation, every claim collapsed to "unsupported". That was reverted.
+
+Write scripts/corpus.ts that looks up the six instruments in CORE (exported from
+lib/mooneto/laws.ts) ONCE, sequentially, with a delay between calls, and writes
+data/corpus.json into the repo. Then change corpus() in laws.ts to read that file
+and merge in any extra law the query names.
+
+Verification that must pass before you commit: ask "Can I own a plot of land on the
+Moon?" and confirm the settled count is NOT zero and that Moon Agreement claims now
+cite the Moon Agreement. If everything comes back unsupported, the corpus failed to
+load — do not ship it.
+
+ITEM 1 — show the provision, not the blog.
+Claims carry a `provision` object (law, year, text). app/page.tsx still renders the
+old `sources` links pointing at blogs like newspaceeconomy.ca. Render the provision
+as the evidence instead, and remove the blog links entirely — they are commentary,
+not authority. Use the existing tokens in app/globals.css, no CSS framework.
+
+Do not touch lib/mooneto/plan.ts or the memo rendering; those are done and verified.
+
+Commit after each item with a message explaining the why. Every commit becomes an
+Entire checkpoint.
+
+---
+
+como hago para probar como vamos? en el localhost le pregunto algo?
+
+---
+
+oka, basicamente ahora la solucion es le pongo una pregunta relacionada legalmente con el espacio, el modelo de openai busca en la base de datos de cala y lo visualiza. falta integrar entire y fal para la parte visual que es la mas vaga
+
+---
+
+Cala
+by Cala
+Trip to Another Hackathon
+−
+The internet is full of data. Most of it is messy, scattered, unreliable.
+
+At Cala, we turn messy, scattered, unreliable data into structured, exhaustive, verified data. That's our bread and butter, and it's why we're building the knowledge layer AI agents rely on.
+
+But we're also obsessed with something else: craft. Taking the time to build something good and lasting. The kind of care that goes into a handmade object, a well-composed photograph, a poem that says more with less. Data doesn't have to live in a spreadsheet. It can be art.
+
+So here's the challenge: pick a topic you're curious about, use Cala to dig into it, and find the most compelling way to show what you found. An infographic, an interactive piece, a game, a short film, a poem, whatever the story needs.
+Good data deserves to be seen, not just queried.
+
+A few sites that inspired this challenge:
+https://neal.fun/size-of-life/
+https://neal.fun/wiki-spy/similar/49905/
+https://ordinaryabundance.com/
+
+How we'll judge it:
+
+Creativity & originality - is this an angle or format we haven't seen before?
+Storytelling & clarity - does the piece actually communicate something?
+Execution & craft - is it well-made, polished, and does it feel finished rather than rushed?
+Use of Cala - how deeply and thoughtfully did Cala’s data shape the final piece?
+
+---
+
+esas son las reglas para la parte visual, me gustaria por ejemplo, si le pregunto acerca de mineria en la luna, que fal cree un mini arte en la luna minando. o cosas asi. si quiero ir por el track visual, tiene que cumplir eso que te pase, sino es el otro track: Open Innovation
+Qualification for the Final
+−
+Build whatever you want, you might just leave with the mvp from your next startup and some cool prizes!
+
+---
+
+genial, probemos el visual con fal a ver q sale
+
+---
+
+abrime el notas asi pego la key
+
+---
+
+no se abrio el txt
+
+---
+
+listo

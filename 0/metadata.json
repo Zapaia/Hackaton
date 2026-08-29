@@ -1,0 +1,61 @@
+{
+  "cli_version": "0.10.3",
+  "checkpoint_id": "01M16QFKVFB6A8Y06P85E0WV4B",
+  "session_id": "01a04d43-f8a4-7881-9a06-3e7d9924dc7d",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-29T12:21:33.193958Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "save_step_count": 1,
+  "files_touched": [
+    "lib/mooneto/fal.ts",
+    "package.json",
+    "pnpm-lock.yaml",
+    "public/illustrations/lunar-mining.webp",
+    "scripts/lunar-mining.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-terra",
+  "turn_id": "4d7993e8fb31",
+  "checkpoint_transcript_start": 215,
+  "transcript_lines_at_start": 215,
+  "compact_transcript_start": 33,
+  "token_usage": {
+    "input_tokens": 38253,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1226240,
+    "output_tokens": 5203,
+    "api_call_count": 19
+  },
+  "session_metrics": {
+    "turn_count": 8
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-08-29T12:21:33.145877Z",
+    "agent_lines": 88,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 88,
+    "total_lines_changed": 88,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 88,
+      "agent_lines_removed": 0
+    }
+  ]
+}
