@@ -15,3 +15,11 @@ mostrame la animacion
 ---
 
 la idea justamente es un pequeno producto que ademas de responderte la pregunta como un agente normal de chat (esta vez con informacion de cala) tenga animaciones de fal para aportar a la visual
+
+---
+
+y entonces?
+
+---
+
+no pero vos estas generando video, yo lo que quiero es una mini animacion de una pequena luna donde un rover va excavando, puede ser lo mas sencilla posible. tipo el jueguito del dinosaurio de google cuando no tiene internet
