@@ -30,6 +30,12 @@ const SUGGESTIONS = [
   "Build me the business case for a lunar mining company",
 ]
 
+const MOON_CRATERS = [
+  { left: "20%", top: "25%", size: 18 }, { left: "59%", top: "20%", size: 29 },
+  { left: "72%", top: "46%", size: 13 }, { left: "37%", top: "57%", size: 23 },
+  { left: "22%", top: "69%", size: 11 }, { left: "67%", top: "75%", size: 19 },
+]
+
 /** Country name -> regional indicator flag. Falls back to a globe. */
 const ISO: Record<string, string> = {
   "United States": "US", "United States of America": "US", "Russian Federation": "RU",
@@ -59,6 +65,7 @@ export default function Mooneto() {
   const [latest, setLatest] = useState<Answer | null>(null)
   const [input, setInput] = useState("")
   const [busy, setBusy] = useState(false)
+  const [showChat, setShowChat] = useState(false)
   const bottom = useRef<HTMLDivElement>(null)
   const miningScene = depictsMining(latest)
 
@@ -106,9 +113,15 @@ export default function Mooneto() {
     <>
       <div className="stars" />
       <div className={`grid${busy ? " busy" : ""}`}>
-        <section className="chat">
+        {showChat && (
+          <button className="chat-scrim" aria-label="Close question panel" onClick={() => setShowChat(false)} />
+        )}
+        <section className={`chat${showChat ? " open" : ""}`}>
           <header>
-            <h1>🌙 Mooneto</h1>
+            <div className="chat-heading">
+              <h1>🌙 Mooneto</h1>
+              <button className="chat-close" type="button" onClick={() => setShowChat(false)} aria-label="Close question panel">×</button>
+            </div>
             <p>
               Space law, sourced. It tells you what is <em>settled</em>, what is{" "}
               <em>disputed</em>, and where it is written.
@@ -213,9 +226,21 @@ export default function Mooneto() {
         </section>
 
         <section className="stage">
+          <button className="chat-toggle" type="button" onClick={() => setShowChat(true)} aria-expanded={showChat}>
+            <span>＋</span> Ask a question
+          </button>
+          {latest && <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>}
+
           <div className={`case-visual${latest ? " active" : ""}`}>
             <div className="moon-origin">
               <div className="moon">
+                {MOON_CRATERS.map((crater, i) => (
+                  <span
+                    className="crater"
+                    key={i}
+                    style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }}
+                  />
+                ))}
                 {miningScene && <span className="moon-rover">▰</span>}
               </div>
               <span className="origin-label">the Moon</span>
@@ -228,14 +253,13 @@ export default function Mooneto() {
                   <div className="treaty-flight" key={law} style={{ animationDelay: `${i * 180}ms` }}>
                     <span className="rocket" aria-hidden="true">🚀</span>
                     <span className="flight-line" />
+                    <span className="star" aria-hidden="true">✦</span>
                     <span className="treaty-node">{law}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
-
-          {latest && <div className={`verdict ${latest.tone}`}>{latest.verdict}</div>}
 
           {latest && latest.countries.length > 0 && (
             <div className="jurisdictions" aria-label="Country positions found by the agent">
