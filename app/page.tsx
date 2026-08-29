@@ -345,9 +345,10 @@ export default function Mooneto() {
 
       {!showingQuestion && (
         <section className="opening">
+          {/* Poses the tension without resolving it: the answers belong to the demo,
+              not to the front door. */}
           <p className="thesis">
-            You can never own lunar land. Whether you can own what you{" "}
-            <em>extract</em> from it depends on where your company is registered.
+            Space law was written in <em>1967</em>. Your business plan was not.
           </p>
           <div className="openers">
             {SUGGESTIONS.map((suggestion) => (
