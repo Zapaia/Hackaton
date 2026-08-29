@@ -1,0 +1,47 @@
+Ask about doing business in space
+Ask
+Can I keep the resources that I extract from mars?
+Permitted
+You can keep resources extracted from Mars under certain laws.
+The law behind this
+Outer Space Treaty1967
+Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.
+1 claim rests on this provision
+U.S. Commercial Space Launch Competitiveness Act2015
+Grants U.S. citizens and companies the right to own, transport, use, and sell resources extracted from asteroids and the Moon; permits asteroid mining companies to keep resources they have collected; extends learning period for regulation of private-sector spaceships until 2023; continues International Space Station operation until at least 2024; continues indemnification of commercial space launches until 2025
+1 claim rests on this provision
+Luxembourg's Space Resources Law2017
+The Luxembourg Space Resources Law (enacted 20 July 2017) establishes that: 1. Space resources (e.g., minerals, water) are capable of being owned, granting private companies property rights over resources they extract. 2. Ownership is recognized only after the entity obtains a specific authorization/licence from the competent minister for each exploration or utilization mission. 3. The law creates a licensing and supervision regime for space‑resource activities, separate from launch and registration rules. 4. It distinguishes between the appropriation of a celestial body (prohibited) and the appropriation of extracted material (permitted), aligning with the Outer Space Treaty. 5. It provides legal certainty for companies incorporated under Luxembourg law (or EU companies with a Luxembourg office) to claim ownership of extracted resources. 6. The framework includes provisions for liability, supervision, and tax incentives to attract space‑mining enterprises.
+1 claim rests on this provision
+Artemis Accords2020
+Resource extraction does not inherently constitute national appropriation under the Outer Space Treaty; Support for deconfliction through coordination and public information; Heritage site protections for lunar landing locations
+1 claim rests on this provision
+Who reads it how
+4 allow0 reject
+
+* 🇱🇺LuxembourgLuxembourg law permits ownership of extracted resources.
+* 🇦🇪United Arab EmiratesUAE law grants ownership rights over space resources.
+* 🇯🇵JapanJapan's law recognizes proprietary rights over extracted resources.
+* 🇺🇸United StatesU.S. law allows ownership of extracted resources.
+* 🇦🇺AustraliaNo specific provisions found in the corpus.
+* 🇨🇦CanadaNo specific provisions found in the corpus.
+* 🇮🇹ItalyNo specific provisions found in the corpus.
+* 🇬🇧United KingdomNo specific provisions found in the corpus.
+* 🇧🇷BrazilNo specific provisions found in the corpus.
+* 🇮🇳IndiaNo specific provisions found in the corpus.
+* 🌍Korea, Republic ofNo specific provisions found in the corpus.
+* 🇳🇬NigeriaNo specific provisions found in the corpus.
+* 🌍RwandaNo specific provisions found in the corpus.
+
+fijate todo eso.
+
+primero, si me paro sobre los paises, me tendria que señalar sobre que tratado esta vinculado el resultado ese que muestra, si us aparece en 2 de 4, se resaltan esos dos. ademas, me gustaria generacion de respuesta mas dinamica, ahora es casi dos minutos hasta que da respuesta, tiene que ser mas visual para el usuario, sino se mueren de impaciencia.
+no hace falta poner paises que no se mencionan, solamente marcar que los que estan se muestren. ademas me gustaria vincular la fuente de los tratados, si es que las tenemos.
+
+---
+
+bueno dale, entendamos que tenemos hasta ahora, que queremos mostrar y que vamos a entregar.
+
+---
+
+no hace falta la verificacion, tardaste 20 minutos
