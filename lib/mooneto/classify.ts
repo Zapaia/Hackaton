@@ -28,16 +28,13 @@ when the corpus or the claims actually say what that state does:
   "rejects" - THAT state is recorded as opposing this reading
   "unclear" - anything else, including a state merely named in passing
 
-For every state, also set "laws" to the names of the instruments in the corpus that carry
-its position, exactly as they are spelled there. Use an empty list when nothing carries it.
-
 Being party to a general treaty is not by itself a rejection of the activity. If your
 "why" for a state would say that its position is not established, its stance is
 "unclear", never "rejects".
 
 Return ONLY JSON:
 {"claims":[{"index":0,"label":"settled","provision":0,"why":"<max 12 words>"}],
- "countries":[{"name":"United States","stance":"enables","why":"<max 12 words>","laws":["Outer Space Treaty"]}],
+ "countries":[{"name":"United States","stance":"enables","why":"<max 12 words>"}],
  "verdict":"<one sentence, plain language, answering the user's question>",
  "tone":"no|yes|split"}
 
@@ -52,12 +49,11 @@ export type LabelledClaim = Claim & {
   why: string
   provision?: Provision | null
 }
-export type CountryStance = { name: string; stance: Stance; why: string; laws?: string[] }
+export type CountryStance = { name: string; stance: Stance; why: string }
 export type Answer = {
   question: string
   verdict: string
   tone: "no" | "yes" | "split"
-  grounded: boolean
   claims: LabelledClaim[]
   countries: CountryStance[]
   laws: string[]
@@ -117,28 +113,10 @@ export async function analyse(found: CalaResult, corpus: Provision[] = []): Prom
     ...claims.flatMap((claim) => claim.provision?.law ? [claim.provision.law] : []),
   ])]
 
-  const labelled = found.claims.map((c, i) => {
-    const verdictFor = labels.get(i)
-    const cited =
-      typeof verdictFor?.provision === "number" ? corpus[verdictFor.provision] : null
-    // Enforced in code, not left to the prompt: no provision, no standing.
-    const label: Label = cited ? verdictFor!.label : "unsupported"
-    return { ...c, label, why: verdictFor?.why ?? "", provision: cited ?? null }
-  })
-
-  // If not one claim is carried by a provision, the page must not also present a
-  // confident yes or no. It said "no provision supports this reading" and "Permitted"
-  // at the same time, which is the one thing this tool exists not to do.
-  const grounded = labelled.some((claim) => claim.label !== "unsupported")
-  const citedLaws = new Set(
-    labelled.flatMap((claim) => (claim.provision ? [claim.provision.law] : []))
-  )
-
   return {
     question: found.question,
     verdict: verdict.verdict ?? "",
-    tone: grounded ? verdict.tone ?? "split" : "split",
-    grounded,
+    tone: verdict.tone ?? "split",
     claims,
     // Enforced in code, because the model kept returning "rejects" while writing a
     // reason that said the position was not established. A tool that reports ten
@@ -149,12 +127,7 @@ export async function analyse(found: CalaResult, corpus: Provision[] = []): Prom
         country.stance !== "unclear" && unevidenced.test(country.why ?? "")
           ? "unclear"
           : country.stance
-      // A state may only point at an instrument the page is actually showing. Otherwise
-      // hovering it highlights nothing and the citation is decoration.
-      const laws = (country.laws ?? []).filter((law) =>
-        [...citedLaws].some((cited) => cited.includes(law) || law.includes(cited))
-      )
-      return { ...country, stance, laws }
+      return { ...country, stance }
     }),
     laws,
   }
