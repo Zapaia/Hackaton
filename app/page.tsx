@@ -76,6 +76,15 @@ function makeStarField(seed: string): FieldStar[] {
   }))
 }
 
+function MoonMark({ mining = false }: { mining?: boolean }) {
+  return (
+    <div className="moon">
+      {MOON_CRATERS.map((crater, i) => <span className="crater" key={i} style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }} />)}
+      {mining && <span className="moon-rover">▰</span>}
+    </div>
+  )
+}
+
 export default function Mooneto() {
   const [thread, setThread] = useState<Array<{ q: string; a?: Answer; error?: string }>>([])
   const [latest, setLatest] = useState<Answer | null>(null)
@@ -302,6 +311,7 @@ export default function Mooneto() {
 
           {exploring && (
             <div className="exploration" aria-live="polite">
+              <MoonMark mining={miningScene} />
               <div className="exploration-track">
                 {Array.from({ length: 6 }, (_, i) => <span className="scout-star" key={i} style={{ animationDelay: `${i * 420}ms` }}>✦</span>)}
                 <span className="scout-rocket" aria-hidden="true">🚀</span>
@@ -311,24 +321,24 @@ export default function Mooneto() {
             </div>
           )}
 
-          {!exploring && <div className={`case-visual${latest ? " active" : ""}`}>
-              <div className="moon-origin">
-                <div className="moon">
-                  {MOON_CRATERS.map((crater, i) => <span className="crater" key={i} style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }} />)}
-                  {miningScene && <span className="moon-rover">▰</span>}
-                </div>
-                <span className="origin-label">the Moon</span>
-              </div>
+          {!exploring && !latest && <div className="base-visual" aria-label="Space law knowledge base">
+            <div className="base-orbit"><span className="base-core">SPACE<br />LAW</span>{["✦", "·", "✧", "·", "✦", "·"].map((mark, i) => <span className="base-star" key={i} style={{ animationDelay: `${i * 240}ms` }}>{mark}</span>)}</div>
+            <p>Ask a question to navigate the legal constellation</p>
+          </div>}
 
-              {latest && <div className="evidence-route" aria-label="Legal route found by the agent">
-                <span className="route-label">instruments found</span>
-                {latest.laws.map((law, i) => (
-                  <div className="treaty-flight" key={law} style={{ animationDelay: `${i * 180}ms`, animationDuration: `${Math.max(.8, Math.min(5, reasoningMs / 1000 / Math.max(1, latest.laws.length)))}s` }}>
-                    <span className="rocket" aria-hidden="true">🚀</span><span className="flight-line" /><span className="star" aria-hidden="true">✦</span><span className="treaty-node">{law}</span>
-                  </div>
-                ))}
-              </div>}
-            </div>}
+          {!exploring && latest && <div className="journey" aria-label="Agent journey through the legal instruments">
+            <div className="journey-moon"><MoonMark mining={miningScene} /><span className="origin-label">the Moon</span></div>
+            <div className="law-orbit">
+              <span className="orbit-ring" />
+              {latest.laws.map((law, i) => {
+                const angle = -90 + (i * 360) / Math.max(1, latest.laws.length)
+                const radians = (angle * Math.PI) / 180
+                return <div className="law-star" key={law} style={{ left: `${50 + Math.cos(radians) * 42}%`, top: `${50 + Math.sin(radians) * 42}%`, animationDelay: `${i * 180}ms` }}><span>✦</span><small>{law}</small></div>
+              })}
+              <span className="journey-rocket" style={{ animationDuration: `${Math.max(4, Math.min(12, reasoningMs / 1000))}s` }} aria-hidden="true">🚀</span>
+            </div>
+            <div className="return-label">route complete · evidence returned to the Moon</div>
+          </div>}
 
           {!exploring && latest && latest.countries.length > 0 && <div className="jurisdictions" aria-label="Country positions found by the agent">
             <span className="jurisdictions-label">jurisdictions reached</span>
