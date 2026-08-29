@@ -114,6 +114,7 @@ export default function Mooneto() {
   async function submit(question: string) {
     if (!question.trim() || busy) return
     setBusy(true)
+    setShowChat(false)
     setActiveQuestion(question.trim())
     setShowReport(false)
     setExploring(true)
@@ -162,9 +163,6 @@ export default function Mooneto() {
     <>
       <div className="stars" />
       <div className={`grid${busy ? " busy" : ""}`}>
-        {showChat && (
-          <button className="chat-scrim" aria-label="Close question panel" onClick={() => setShowChat(false)} />
-        )}
         <section className={`chat${showChat ? " open" : ""}`}>
           <header>
             <div className="chat-heading">
@@ -275,9 +273,14 @@ export default function Mooneto() {
         </section>
 
         <section className="stage">
-          <button className="chat-toggle" type="button" onClick={() => setShowChat(true)} aria-expanded={showChat}>
+          {!showChat && <button className="chat-toggle" type="button" onClick={() => setShowChat(true)} aria-expanded={showChat}>
             <span>＋</span> Ask a question
-          </button>
+          </button>}
+          {showChat && <form className="ask-inline" onSubmit={(event) => { event.preventDefault(); submit(input) }}>
+            <input autoFocus value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about space law…" aria-label="Space law question" />
+            <button type="submit" disabled={busy}>Ask</button>
+            <button className="ask-cancel" type="button" onClick={() => setShowChat(false)} aria-label="Close question input">×</button>
+          </form>}
           <div className="visual-stars" aria-hidden="true">
             {starField.map((star, i) => (
               <i key={i} style={{ left: star.left, top: star.top, width: star.size, height: star.size, animationDelay: `${star.delay}ms` }} />
@@ -316,7 +319,7 @@ export default function Mooneto() {
                 {Array.from({ length: 6 }, (_, i) => <span className="scout-star" key={i} style={{ animationDelay: `${i * 420}ms` }}>✦</span>)}
                 <span className="scout-rocket" aria-hidden="true">🚀</span>
               </div>
-              <p>Tracing the legal constellation…</p>
+              <p>Reading Cala’s resource graph…</p>
               <small>{(thinkingMs / 1000).toFixed(1)}s</small>
             </div>
           )}
