@@ -1,4 +1,4 @@
-# Lex Orbis — Design
+# Mooneto — Design
 
 > A visual legal advisor for people and businesses that want to operate in space.
 > It does not tell you what to do. It tells you **what is settled, what is disputed, and where it is written** — and builds a traceable case file as you explore.
