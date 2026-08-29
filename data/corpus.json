@@ -3,18 +3,33 @@
     "law": "Outer Space Treaty",
     "officialTitle": "Outer Space Treaty",
     "year": 1967,
-    "text": "Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means."
+    "text": "Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means.",
+    "official": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/outerspacetreaty.html"
   },
   {
     "law": "Moon Agreement",
     "officialTitle": "Moon Agreement",
     "year": 1979,
-    "text": "Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing"
+    "text": "Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing",
+    "official": "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/intromoon-agreement.html"
   },
   {
     "law": "Artemis Accords",
     "officialTitle": "Artemis Accords",
     "year": 2020,
-    "text": "Resource extraction does not inherently constitute national appropriation under the Outer Space Treaty; Support for deconfliction through coordination and public information; Heritage site protections for lunar landing locations"
+    "text": "Resource extraction does not inherently constitute national appropriation under the Outer Space Treaty; Support for deconfliction through coordination and public information; Heritage site protections for lunar landing locations",
+    "official": "https://www.nasa.gov/artemis-accords/"
+  },
+  {
+    "law": "U.S. Commercial Space Launch Competitiveness Act",
+    "officialTitle": "U.S. Commercial Space Launch Competitiveness Act",
+    "year": 2015,
+    "text": "Grants U.S. citizens and companies the right to own, transport, use, and sell resources extracted from asteroids and the Moon; permits asteroid mining companies to keep resources they have collected; extends learning period for regulation of private-sector spaceships until 2023; continues International Space Station operation until at least 2024; continues indemnification of commercial space launches until 2025"
+  },
+  {
+    "law": "Luxembourg's Space Resources Law",
+    "officialTitle": "Law of 20 July 2017 on the exploration and use of space resources",
+    "year": 2017,
+    "text": "The Luxembourg Space Resources Law (enacted 20 July 2017) establishes that:\n1. Space resources (e.g., minerals, water) are capable of being owned, granting private companies property rights over resources they extract.\n2. Ownership is recognized only after the entity obtains a specific authorization/licence from the competent minister for each exploration or utilization mission.\n3. The law creates a licensing and supervision regime for space‑resource activities, separate from launch and registration rules.\n4. It distinguishes between the appropriation of a celestial body (prohibited) and the appropriation of extracted material (permitted), aligning with the Outer Space Treaty.\n5. It provides legal certainty for companies incorporated under Luxembourg law (or EU companies with a Luxembourg office) to claim ownership of extracted resources.\n6. The framework includes provisions for liability, supervision, and tax incentives to attract space‑mining enterprises."
   }
 ]

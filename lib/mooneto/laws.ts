@@ -20,12 +20,21 @@ const API = "https://api.cala.ai"
  * classifier with no evidence at all.
  */
 export const CORE = [
+  // The five UN instruments plus the Accords.
   "Outer Space Treaty",
   "Moon Agreement",
   "Artemis Accords",
   "Rescue Agreement",
   "Liability Convention",
   "Registration Convention",
+  // The national statutes that decide almost every commercial question. Looking these up
+  // live cost two chained Cala calls each and was most of a two-minute wait; they change
+  // about as often as the treaties do, so they belong in the baked corpus.
+  // Spelled exactly as Cala holds them: the lookup matches on name, and
+  // "Luxembourg Space Resources Law" finds nothing while the genitive does.
+  "U.S. Commercial Space Launch Competitiveness Act",
+  "Luxembourg's Space Resources Law",
+  "Space Resources Act",
 ]
 
 export type Provision = {
@@ -33,20 +42,50 @@ export type Provision = {
   officialTitle?: string
   year?: number
   text: string
+  official?: string
+}
+
+/**
+ * Official depositary texts.
+ *
+ * Cala attaches no source to `key_provisions`, and the sources it does carry point at
+ * secondary commentary — the very thing this product refuses to cite as authority. The
+ * citable source for an instrument is the instrument, so these are the depositary pages,
+ * each one verified to resolve. An instrument with no verified official text gets no
+ * link rather than a guessed one.
+ */
+const OFFICIAL: Record<string, string> = {
+  "outer space treaty":
+    "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/outerspacetreaty.html",
+  "moon agreement":
+    "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/intromoon-agreement.html",
+  "liability convention":
+    "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/introliability-convention.html",
+  "rescue agreement":
+    "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/introrescueagreement.html",
+  "registration convention":
+    "https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/introregistration-convention.html",
+  "artemis accords": "https://www.nasa.gov/artemis-accords/",
+}
+
+function officialText(law: string): string | undefined {
+  const key = law.toLowerCase()
+  const match = Object.keys(OFFICIAL).find((name) => key.includes(name))
+  return match ? OFFICIAL[match] : undefined
 }
 
 async function call(path: string, init: RequestInit): Promise<any | null> {
   const key = process.env.CALA_API_KEY
   if (!key) throw new Error("CALA_API_KEY is not set")
 
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     const res = await fetch(`${API}${path}`, {
       ...init,
       headers: { "X-API-KEY": key, "Content-Type": "application/json", ...init.headers },
     })
     if (res.ok) return res.json()
     if (res.status !== 429 && res.status < 500) return null
-    await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)))
+    await new Promise((r) => setTimeout(r, 2500 * (attempt + 1)))
   }
   return null
 }
@@ -88,6 +127,7 @@ export async function lookupLaw(
     officialTitle: props.official_title?.value,
     year: props.enactment_year?.value,
     text,
+    official: officialText(entity.name),
   }))
   if (useCache) await write(cacheKey, [], provisions)
   return provisions

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 
 type Source = { name: string; url: string }
-type Provision = { law: string; officialTitle?: string; year?: number; text: string }
+type Provision = { law: string; officialTitle?: string; year?: number; text: string; official?: string }
 type Claim = {
   text: string
   sources: Source[]
@@ -11,7 +11,7 @@ type Claim = {
   why: string
   provision?: Provision | null
 }
-type Country = { name: string; stance: "enables" | "rejects" | "unclear"; why: string }
+type Country = { name: string; stance: "enables" | "rejects" | "unclear"; why: string; laws?: string[] }
 type PlanStep = { step: string; basis: string }
 type PlanRisk = { risk: string; trigger: string }
 type Plan = {
@@ -26,6 +26,7 @@ type Answer = {
   plan?: Plan
   verdict: string
   tone: "no" | "yes" | "split"
+  grounded?: boolean
   claims: Claim[]
   countries: Country[]
   laws: string[]
@@ -71,6 +72,20 @@ const ISO: Record<string, string> = {
   Mexico: "MX", Israel: "IL", "Saudi Arabia": "SA", Nigeria: "NG", Colombia: "CO",
   Spain: "ES", Argentina: "AR", Netherlands: "NL", Belgium: "BE", Austria: "AT",
   Chile: "CL", Philippines: "PH", Peru: "PE", Morocco: "MA", Kazakhstan: "KZ",
+  "Korea, Republic of": "KR", Rwanda: "RW", Portugal: "PT", Greece: "GR",
+  Sweden: "SE", Norway: "NO", Denmark: "DK", Finland: "FI", Switzerland: "CH",
+  Singapore: "SG", Indonesia: "ID", Thailand: "TH", Turkey: "TR", Egypt: "EG",
+  "South Africa": "ZA", Kenya: "KE", Angola: "AO", Bahrain: "BH", Ecuador: "EC",
+  Uruguay: "UY", Romania: "RO", Bulgaria: "BG", Czechia: "CZ", Hungary: "HU",
+  Ireland: "IE", Iceland: "IS", Slovenia: "SI",
+}
+
+/** A provision often arrives as several clauses in one block. Split it so it can be read. */
+function clauses(text: string): string[] {
+  const numbered = text.split(/(?=\b\d+\.\s)/).map((part) => part.trim()).filter(Boolean)
+  if (numbered.length > 1) return numbered
+  const parts = text.split(";").map((part) => part.trim()).filter(Boolean)
+  return parts.length > 1 ? parts : [text]
 }
 
 function flag(name: string) {
@@ -183,6 +198,50 @@ function RocketMark() {
   )
 }
 
+function Instrument({
+  law, provision, count, dimmed,
+}: {
+  law: string
+  provision: Provision | null
+  count: number
+  dimmed: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const parts = provision ? clauses(provision.text) : []
+  const long = parts.length > 1 || (provision?.text.length ?? 0) > 220
+  const shown = open || !long ? parts : parts.slice(0, 1)
+
+  return (
+    <article className={`instrument${dimmed ? " dimmed" : ""}`} data-law={law}>
+      <h3>
+        {law}
+        {provision?.year ? <span className="year">{provision.year}</span> : null}
+        {provision?.official && (
+          <a className="official" href={provision.official} target="_blank" rel="noreferrer">
+            official text
+          </a>
+        )}
+      </h3>
+
+      <ul className="clauses">
+        {shown.map((clause, i) => (
+          <li key={i}>{clause}</li>
+        ))}
+      </ul>
+
+      {long && (
+        <button className="more" type="button" onClick={() => setOpen((v) => !v)}>
+          {open ? "Show less" : `Read all ${parts.length} clauses`}
+        </button>
+      )}
+
+      <p className="grounds">
+        {count} {count === 1 ? "claim rests" : "claims rest"} on this provision
+      </p>
+    </article>
+  )
+}
+
 function MoonMark() {
   return (
     <svg className="mark" viewBox="0 0 24 24" aria-hidden="true">
@@ -204,6 +263,7 @@ export default function Mooneto() {
   const [step, setStep] = useState(0)
   const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
   const [journeyStep, setJourneyStep] = useState(0)
+  const [hovered, setHovered] = useState<string[] | null>(null)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoBusy, setVideoBusy] = useState(false)
   const startedAt = useRef(0)
@@ -220,8 +280,14 @@ export default function Mooneto() {
   const countries = latest
     ? [...latest.countries].sort((a, b) => stanceOrder[a.stance] - stanceOrder[b.stance])
     : []
-  const enables = countries.filter((c) => c.stance === "enables").length
-  const rejects = countries.filter((c) => c.stance === "rejects").length
+  // A state with no position and no instrument behind it is noise: it pads the map with
+  // rows that all say the same nothing. Keep only states the sources actually place.
+  const placed = countries.filter(
+    (c) => c.stance !== "unclear" || (c.laws?.length ?? 0) > 0
+  )
+  const shownCountries = placed.length > 0 ? placed : countries.slice(0, 4)
+  const enables = shownCountries.filter((c) => c.stance === "enables").length
+  const rejects = shownCountries.filter((c) => c.stance === "rejects").length
 
   useEffect(() => {
     if (!busy) return
@@ -425,8 +491,16 @@ export default function Mooneto() {
 
               {latest && !busy && (
                 <>
-                  <p className={`tone ${latest.tone}`}>{TONE_LABEL[latest.tone]}</p>
+                  <p className={`tone ${latest.tone}`}>
+                    {latest.grounded === false ? "Not settled by any instrument" : TONE_LABEL[latest.tone]}
+                  </p>
                   <p className="verdict">{latest.verdict}</p>
+                  {latest.grounded === false && (
+                    <p className="ungrounded">
+                      No provision in the corpus carries this. Treat it as a starting point,
+                      not an answer.
+                    </p>
+                  )}
                   {latest.resolved && latest.resolved !== latest.question && (
                     <p className="reading">Read as “{latest.resolved}”</p>
                   )}
@@ -446,16 +520,13 @@ export default function Mooneto() {
                   </p>
                 ) : (
                   evidence.map(({ law, provision, count }) => (
-                    <article key={law} className="instrument">
-                      <h3>
-                        {law}
-                        {provision?.year ? <span className="year">{provision.year}</span> : null}
-                      </h3>
-                      <blockquote>{provision?.text}</blockquote>
-                      <p className="grounds">
-                        {count} {count === 1 ? "claim rests" : "claims rest"} on this provision
-                      </p>
-                    </article>
+                    <Instrument
+                      key={law}
+                      law={law}
+                      provision={provision}
+                      count={count}
+                      dimmed={hovered !== null && !hovered.some((l) => law.includes(l) || l.includes(law))}
+                    />
                   ))
                 )}
 
@@ -486,7 +557,7 @@ export default function Mooneto() {
 
               <aside className="positions">
                 <h2>Who reads it how</h2>
-                {countries.length === 0 ? (
+                {shownCountries.length === 0 ? (
                   <p className="none">No state position established by the sources.</p>
                 ) : (
                   <>
@@ -495,11 +566,22 @@ export default function Mooneto() {
                       <span className="rejects">{rejects} reject</span>
                     </p>
                     <ul className="states">
-                      {countries.map((country) => (
-                        <li key={country.name} className={country.stance}>
+                      {shownCountries.map((country) => (
+                        <li
+                          key={country.name}
+                          className={country.stance}
+                          onMouseEnter={() => setHovered(country.laws ?? [])}
+                          onMouseLeave={() => setHovered(null)}
+                          onFocus={() => setHovered(country.laws ?? [])}
+                          onBlur={() => setHovered(null)}
+                          tabIndex={0}
+                        >
                           <span className="flag" aria-hidden="true">{flag(country.name)}</span>
                           <span className="name">{country.name}</span>
                           <span className="why">{country.why}</span>
+                          {(country.laws?.length ?? 0) > 0 && (
+                            <span className="under">{country.laws!.join(" · ")}</span>
+                          )}
                         </li>
                       ))}
                     </ul>
