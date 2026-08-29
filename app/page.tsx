@@ -75,6 +75,11 @@ const MIN_THINKING_MS = Number(process.env.NEXT_PUBLIC_MIN_THINKING_MS ?? 0)
  */
 const MIN_SCENE_MS = Number(process.env.NEXT_PUBLIC_MIN_SCENE_MS ?? 0)
 
+// Manual fetches and public assets do not receive Next's basePath automatically.
+// This stays empty locally and becomes /mooneto in the portfolio proxy deployment.
+const APP_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+const appPath = (path: string) => `${APP_BASE_PATH}${path}`
+
 const TONE_LABEL: Record<Answer["tone"], string> = {
   no: "Prohibited",
   yes: "Permitted",
@@ -283,7 +288,7 @@ export default function Mooneto() {
     // The scene is generated alongside the answer, never in front of it. The legal
     // reading lands as soon as it is ready; the animation drops into the stage that was
     // already holding its place.
-    fetch("/api/video", {
+    fetch(appPath("/api/video"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: asked }),
@@ -311,7 +316,7 @@ export default function Mooneto() {
         laws: [...new Set(answered.flatMap((a) => a.laws))],
       }
 
-      const res = await fetch("/api/ask", {
+      const res = await fetch(appPath("/api/ask"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: asked, history, gathered }),
