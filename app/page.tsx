@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 
-type Source = { name: string; url: string }
-type Claim = { text: string; sources: Source[]; label: string; why: string }
+type Provision = { law: string; year?: number; text: string }
+type Claim = { text: string; label: string; why: string; provision?: Provision | null }
 type Country = { name: string; stance: string; why: string }
 type PlanStep = { step: string; basis: string }
 type PlanRisk = { risk: string; trigger: string }
@@ -167,14 +167,15 @@ export default function Mooneto() {
                         <span className={`tag ${c.label}`}>{c.label}</span>
                         <p>{c.text}</p>
                         {c.why && <p className="why">{c.why}</p>}
-                        {c.sources.length > 0 && (
-                          <div className="src">
-                            {c.sources.map((s, k) => (
-                              <a key={k} href={s.url} target="_blank" rel="noreferrer">
-                                {new URL(s.url).hostname.replace("www.", "")}
-                              </a>
-                            ))}
-                          </div>
+                        {c.provision && (
+                          <aside className="provision" aria-label="Legal provision">
+                            <span className="provision-label">Legal provision</span>
+                            <p className="provision-law">
+                              {c.provision.law}
+                              {c.provision.year ? ` · ${c.provision.year}` : ""}
+                            </p>
+                            <blockquote>{c.provision.text}</blockquote>
+                          </aside>
                         )}
                       </div>
                     ))}
