@@ -1,0 +1,30 @@
+ademas, en este momento el codigo que se genera para visualizacion se puede pisar entre si, una estrella arrbia de la luna, el cohete no tiene recorrido smooth ni va de la estrella a la luna y de ahi a otro lado
+
+---
+
+la mini visual de tracing the costelation tiene que ser reemplazada por el video de minimax apenas este, porque ademas tarda tanto en generar la respuesta.
+
+---
+
+is it possible to mine in the moon?Hide agent report ↑
+0 instruments
+0 jurisdictions
+unsupported
+Mining on the Moon is technically feasible but has not yet been demonstrated, as no company or government has harvested lunar resources to date.
+unsupported
+Water ice in permanently shadowed craters can be extracted and split into hydrogen and oxygen for rocket fuel, a concept pursued by startups such as Starpath Robotics.
+unsupported
+Helium‑3, a rare isotope deposited by the solar wind, is considered a valuable resource for fusion and quantum applications; Interlune aims to prove sufficient reserves exist for mining.
+unsupported
+Lunar regolith contains molecular oxygen and metals that could be extracted for life‑support or industrial use, a target of ESA’s feasibility studies and the Australian Space Agency’s water‑mining program.
+disputed
+NASA’s Commercial Lunar Payload Services (CLPS) program is enabling private missions to carry sampling and processing equipment to the Moon, supporting the development of mining technologies.
+agent answer
+Mining on the Moon is currently unresolved under international law.
+
+the Moon
+route complete · evidence returned to the Moon fijate la respuesta que me da ambiando la pregunta a la preseteada que tenias, donde basicamente pregunto lo mismo
+
+---
+
+no hardcodees cosas, el agente tiene que ser capaz de interpretar preguntas diferentes, buscar en cala y ahi dar la repsuesta
