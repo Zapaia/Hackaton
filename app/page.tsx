@@ -62,6 +62,13 @@ function depictsMiningText(text: string) {
 }
 
 type FieldStar = { left: string; top: string; size: number; delay: number }
+type RoutePoint = { left: number; top: number }
+
+const ROUTE_SLOTS: RoutePoint[] = [
+  { left: 12, top: 24 }, { left: 32, top: 8 }, { left: 57, top: 8 },
+  { left: 82, top: 24 }, { left: 91, top: 57 }, { left: 73, top: 87 },
+  { left: 43, top: 92 }, { left: 17, top: 76 }, { left: 8, top: 52 },
+]
 
 function makeStarField(seed: string): FieldStar[] {
   let hash = [...seed].reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 17)
@@ -77,12 +84,47 @@ function makeStarField(seed: string): FieldStar[] {
   }))
 }
 
+function makeRoutePoints(field: FieldStar[], count: number): RoutePoint[] {
+  let hash = field.reduce((value, star) => value ^ Math.round(parseFloat(star.left) * 97 + parseFloat(star.top) * 193), 23) >>> 0
+  const next = () => {
+    hash = (hash * 1664525 + 1013904223) >>> 0
+    return hash / 4294967296
+  }
+  const slots = ROUTE_SLOTS.map((slot) => ({ ...slot }))
+  for (let i = slots.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(next() * (i + 1))
+    ;[slots[i], slots[j]] = [slots[j], slots[i]]
+  }
+  return slots.slice(0, Math.min(count, slots.length))
+}
+
+function routePath(points: RoutePoint[]) {
+  const route = [{ left: 50, top: 50 }, ...points.flatMap((point) => [point, { left: 50, top: 50 }])]
+  return route.map((point, i) => `${i === 0 ? "M" : "L"} ${point.left} ${point.top}`).join(" ")
+}
+
+function routeTarget(step: number, points: RoutePoint[]): RoutePoint {
+  if (step < 1 || points.length === 0) return { left: 50, top: 50 }
+  const point = points[Math.min(points.length - 1, Math.floor((step - 1) / 2))]
+  return step % 2 === 1 ? point : { left: 50, top: 50 }
+}
+
 function MoonMark({ mining = false }: { mining?: boolean }) {
   return (
     <div className="moon">
       {MOON_CRATERS.map((crater, i) => <span className="crater" key={i} style={{ left: crater.left, top: crater.top, width: crater.size, height: crater.size }} />)}
-      {mining && <span className="moon-rover">▰</span>}
+      {mining && <span className="moon-rover" aria-hidden="true"><i /><i /><b /></span>}
     </div>
+  )
+}
+
+function RocketMark() {
+  return (
+    <svg className="rocket-mark" viewBox="0 0 28 28" aria-hidden="true">
+      <path d="M18.9 3.3c-4.2.3-7.7 2.7-9.8 6.1l-2.8.4a1.4 1.4 0 0 0-.9.5l-1.7 2.1 4.4 1.3 2.2 2.2 1.3 4.4 2.1-1.7c.3-.2.5-.6.5-.9l.4-2.8c3.4-2.1 5.8-5.6 6.1-9.8l-1.8-1.8Z" fill="currentColor" />
+      <circle cx="16.8" cy="9.7" r="1.9" fill="var(--bg)" />
+      <path d="M8.2 17.1c-1.3.1-2.5.7-3.4 1.6-.7.7-.9 1.6-.8 2.5.9.1 1.8-.2 2.5-.8.9-.9 1.5-2.1 1.7-3.3ZM10.9 19.8c-.1 1.3-.7 2.5-1.6 3.4-.7.7-1.6.9-2.5.8-.1-.9.2-1.8.8-2.5.9-.9 2.1-1.5 3.3-1.7Z" fill="currentColor" opacity=".75" />
+    </svg>
   )
 }
 
@@ -95,23 +137,34 @@ export default function Mooneto() {
   const [showReport, setShowReport] = useState(false)
   const [activeQuestion, setActiveQuestion] = useState("")
   const [exploring, setExploring] = useState(false)
-  const [reasoningMs, setReasoningMs] = useState(0)
   const [thinkingMs, setThinkingMs] = useState(0)
   const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
+  const [journeyStep, setJourneyStep] = useState(0)
   const bottom = useRef<HTMLDivElement>(null)
   const thinkingStarted = useRef(0)
   const miningScene = depictsMining(latest) || depictsMiningText(activeQuestion)
-
-  function treatyPosition(index: number) {
-    const star = starField[(index * 7 + 3) % starField.length]
-    return { left: `${18 + parseFloat(star.left) * 0.64}%`, top: `${15 + parseFloat(star.top) * 0.7}%` }
-  }
+  const routeCount = latest?.laws.length ?? (exploring ? 6 : 0)
+  const routePoints = makeRoutePoints(starField, routeCount)
+  const currentTarget = routeTarget(journeyStep, routePoints)
 
   useEffect(() => {
     if (!exploring) return
     const ticker = window.setInterval(() => setThinkingMs(Date.now() - thinkingStarted.current), 100)
     return () => window.clearInterval(ticker)
   }, [exploring])
+
+  useEffect(() => {
+    if (routeCount === 0) {
+      setJourneyStep(0)
+      return
+    }
+    setJourneyStep(0)
+    const maxStep = routeCount * 2
+    const timer = window.setInterval(() => {
+      setJourneyStep((step) => exploring ? (step >= maxStep ? 0 : step + 1) : Math.min(step + 1, maxStep))
+    }, exploring ? 900 : 1000)
+    return () => window.clearInterval(timer)
+  }, [exploring, latest?.question, routeCount])
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" })
@@ -126,7 +179,6 @@ export default function Mooneto() {
     setExploring(true)
     thinkingStarted.current = Date.now()
     setThinkingMs(0)
-    setReasoningMs(0)
     setStarField(makeStarField(`${question}:${Date.now()}`))
     setLatest(null)
     setInput("")
@@ -153,7 +205,6 @@ export default function Mooneto() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "request failed")
-      setReasoningMs(Date.now() - thinkingStarted.current)
       setExploring(false)
       setThread((t) => t.map((x, i) => (i === turn ? { ...x, a: data } : x)))
       setLatest(data)
@@ -278,7 +329,7 @@ export default function Mooneto() {
           </form>
         </section>
 
-        <section className="stage">
+        <section className="stage" aria-busy={busy}>
           {!showChat && <button className="chat-toggle" type="button" onClick={() => setShowChat(true)} aria-expanded={showChat}>
             <span>＋</span> Ask a question
           </button>}
@@ -314,7 +365,7 @@ export default function Mooneto() {
                   </>
                 )}
               </div>
-              {latest && !exploring && <div className={`answer-card ${latest.tone}`}><span>agent answer</span><p>{latest.verdict}</p></div>}
+              {latest && !exploring && <div className={`answer-card ${latest.tone}`} aria-live="polite"><span>agent answer</span><p>{latest.verdict}</p></div>}
             </div>
           )}
 
@@ -322,28 +373,37 @@ export default function Mooneto() {
             <div className="exploration" aria-live="polite">
               <div className="exploration-orbit">
                 <span className="orbit-ring" />
-                {starField.slice(0, 12).map((star, i) => <span className="scout-star" key={i} style={{ left: star.left, top: star.top, animationDelay: `${star.delay}ms` }}>✦</span>)}
+                <svg className="journey-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d={routePath(routePoints)} /></svg>
+                {routePoints.map((point, i) => <span className="scout-star" key={i} style={{ left: `${point.left}%`, top: `${point.top}%`, animationDelay: `${i * 160}ms` }}>✦</span>)}
                 <div className="exploration-moon"><MoonMark mining={miningScene} /></div>
-                <span className="journey-rocket" style={{ animationDuration: "4.8s" }} aria-hidden="true">🚀</span>
+                <span className="journey-rocket" style={{ left: `${currentTarget.left}%`, top: `${currentTarget.top}%` }}><RocketMark /></span>
               </div>
-              <small>{(thinkingMs / 1000).toFixed(1)}s</small>
+              <div className="exploration-caption" role="status"><span className="live-dot" /> <span>Tracing the legal constellation</span><time>{(thinkingMs / 1000).toFixed(1)}s</time></div>
             </div>
           )}
 
           {!exploring && !latest && <div className="base-visual" aria-label="Space law knowledge base">
             <div className="base-orbit"><span className="base-core">SPACE<br />LAW</span>{["✦", "·", "✧", "·", "✦", "·"].map((mark, i) => <span className="base-star" key={i} style={{ animationDelay: `${i * 240}ms` }}>{mark}</span>)}</div>
-            <p>Ask a question to navigate the legal constellation</p>
+            <div className="base-copy">
+              <p className="base-title">Navigate the legal constellation</p>
+              <p className="base-hint">Ask about a mission, a resource, or a jurisdiction.</p>
+              <div className="base-suggestions" aria-label="Example questions">
+                {SUGGESTIONS.slice(0, 2).map((suggestion) => <button key={suggestion} type="button" onClick={() => submit(suggestion)}>{suggestion}</button>)}
+              </div>
+            </div>
           </div>}
 
           {!exploring && latest && <div className="journey" aria-label="Agent journey through the legal instruments">
             <div className="journey-moon"><MoonMark mining={miningScene} /><span className="origin-label">the Moon</span></div>
             <div className="law-orbit">
               <span className="orbit-ring" />
+              <svg className="journey-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d={routePath(routePoints)} /></svg>
               {latest.laws.map((law, i) => {
-                const position = treatyPosition(i)
-                return <div className="law-star" key={law} style={{ ...position, animationDelay: `${i * 180}ms` }}><span>✦</span><small>{law}</small></div>
+                const position = routePoints[i] ?? { left: 50, top: 50 }
+                const visited = journeyStep >= i * 2 + 1
+                return <div className={`law-star${visited ? " visited" : ""}`} key={law} style={{ left: `${position.left}%`, top: `${position.top}%`, animationDelay: `${i * 180}ms` }}><span>✦</span><small>{law}</small></div>
               })}
-              <span className="journey-rocket" style={{ animationDuration: `${Math.max(4, Math.min(12, reasoningMs / 1000))}s` }} aria-hidden="true">🚀</span>
+              <span className="journey-rocket" style={{ left: `${currentTarget.left}%`, top: `${currentTarget.top}%` }}><RocketMark /></span>
             </div>
             <div className="return-label">route complete · evidence returned to the Moon</div>
           </div>}
