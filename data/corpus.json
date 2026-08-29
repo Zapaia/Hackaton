@@ -1,0 +1,20 @@
+[
+  {
+    "law": "Outer Space Treaty",
+    "officialTitle": "Outer Space Treaty",
+    "year": 1967,
+    "text": "Article II states that outer space, including the Moon and other celestial bodies, is not subject to national appropriation by claim of sovereignty, by means of use or occupation, or by any other means."
+  },
+  {
+    "law": "Moon Agreement",
+    "officialTitle": "Moon Agreement",
+    "year": 1979,
+    "text": "Common heritage of mankind principle; restrictions on commercial exploitation of lunar resources; provisions for equitable benefit sharing"
+  },
+  {
+    "law": "Artemis Accords",
+    "officialTitle": "Artemis Accords",
+    "year": 2020,
+    "text": "Resource extraction does not inherently constitute national appropriation under the Outer Space Treaty; Support for deconfliction through coordination and public information; Heritage site protections for lunar landing locations"
+  }
+]
