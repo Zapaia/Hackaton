@@ -24,6 +24,18 @@ type Answer = {
   laws: string[]
 }
 
+const STANCE_META = {
+  enables: { label: "Supports", tone: "enables" },
+  rejects: { label: "Rejects", tone: "rejects" },
+  unclear: { label: "Unclear", tone: "unclear" },
+} as const
+
+function answerToneLabel(tone: string) {
+  if (tone === "no") return "prohibited reading"
+  if (tone === "yes") return "permitted reading"
+  return "jurisdiction-dependent"
+}
+
 const SUGGESTIONS = [
   "Can I own a plot of land on the Moon?",
   "But can I keep the resources I extract there?",
@@ -150,6 +162,19 @@ export default function Mooneto() {
   const routePoints = makeRoutePoints(starField, routeCount)
   const currentTarget = routeTarget(journeyStep, routePoints)
   const showMinimaxVideo = exploring && miningScene && !visualVideoFailed
+  const treatyEvidence = latest?.laws.map((law) => {
+    const grounded = latest.claims.filter((claim) => claim.provision?.law === law)
+    const provision = grounded[0]?.provision ?? null
+    return { law, provision, claimCount: grounded.length }
+  }) ?? []
+  const sortedCountries = latest ? [...latest.countries].sort((a, b) => {
+    const order = { enables: 0, rejects: 1, unclear: 2 }
+    return order[a.stance as keyof typeof order] - order[b.stance as keyof typeof order]
+  }) : []
+  const stanceCounts = sortedCountries.reduce((counts, country) => {
+    counts[country.stance] = (counts[country.stance] ?? 0) + 1
+    return counts
+  }, {} as Record<string, number>)
 
   useEffect(() => {
     if (!exploring) return
@@ -371,7 +396,10 @@ export default function Mooneto() {
                   </>
                 )}
               </div>
-              {latest && !exploring && <div className={`answer-card ${latest.tone}`} aria-live="polite"><span>agent answer</span><p>{latest.verdict}</p></div>}
+              {latest && !exploring && <div className={`answer-card ${latest.tone}`} aria-live="polite">
+                <div className="answer-meta"><span>agent answer</span><strong>{answerToneLabel(latest.tone)}</strong></div>
+                <p>{latest.verdict}</p>
+              </div>}
             </div>
           )}
 
@@ -423,11 +451,43 @@ export default function Mooneto() {
             <div className="return-label">route complete · evidence returned to the Moon</div>
           </div>}
 
-          {!exploring && latest && latest.countries.length > 0 && <div className="jurisdictions" aria-label="Country positions found by the agent">
-            <span className="jurisdictions-label">jurisdictions reached</span>
-            <div className="flags">
-              {latest.countries.map((c, i) => <div className={`flag ${c.stance}`} key={c.name} title={c.why} style={{ animationDelay: `${latest.laws.length * 180 + i * 70}ms` }}><span className="em">{flag(c.name)}</span><span>{c.name}</span><span className="st">{c.stance}</span></div>)}
-            </div>
+          {!exploring && latest && <div className="answer-details">
+            <section className="evidence-panel" aria-labelledby="treaty-evidence-title">
+              <div className="panel-heading">
+                <div><h2 id="treaty-evidence-title">Treaty evidence</h2><p>The instruments the agent used to form this reading.</p></div>
+                <span className="panel-count">{treatyEvidence.length} instruments</span>
+              </div>
+              <div className="treaty-list">
+                {treatyEvidence.length > 0 ? treatyEvidence.map(({ law, provision, claimCount }) => (
+                  <article className={`treaty-row${provision ? " grounded" : " ungrounded"}`} key={law}>
+                    <div className="treaty-row-head">
+                      <span className="treaty-mark" aria-hidden="true">✦</span>
+                      <div className="treaty-name"><h3>{law}</h3><p>{provision?.year ? `${provision.year} · ` : ""}{claimCount ? `${claimCount} grounded ${claimCount === 1 ? "claim" : "claims"}` : "Named by Cala"}</p></div>
+                      <span className={`evidence-status ${provision ? "grounded" : "ungrounded"}`}>{provision ? "Provision cited" : "No provision"}</span>
+                    </div>
+                    {provision ? <blockquote>{provision.text}</blockquote> : <p className="evidence-empty">No structured provision was returned for this instrument.</p>}
+                  </article>
+                )) : <p className="evidence-empty">No treaty was named for this question.</p>}
+              </div>
+            </section>
+
+            <section className="jurisdictions" aria-labelledby="jurisdiction-title">
+              <div className="panel-heading">
+                <div><h2 id="jurisdiction-title">Jurisdiction positions</h2><p>How the named countries read this activity.</p></div>
+                <div className="stance-counts" aria-label="Jurisdiction stance summary">
+                  {(Object.keys(STANCE_META) as Array<keyof typeof STANCE_META>).map((stance) => <span className={`stance-count ${STANCE_META[stance].tone}`} key={stance}><b>{stanceCounts[stance] ?? 0}</b> {STANCE_META[stance].label}</span>)}
+                </div>
+              </div>
+              {sortedCountries.length > 0 ? <div className="flags">
+                {sortedCountries.map((country, i) => {
+                  const meta = STANCE_META[country.stance as keyof typeof STANCE_META] ?? STANCE_META.unclear
+                  return <article className={`flag ${meta.tone}`} key={country.name} style={{ animationDelay: `${latest.laws.length * 180 + i * 70}ms` }}>
+                    <div className="flag-top"><span className="em">{flag(country.name)}</span><div><h3>{country.name}</h3><span className="st"><i className="stance-mark" aria-hidden="true" />{meta.label}</span></div></div>
+                    <p>{country.why}</p>
+                  </article>
+                })}
+              </div> : <div className="jurisdiction-empty"><span className="empty-orbit" aria-hidden="true">·</span><p>No country-specific stance was established for this question.</p></div>}
+            </section>
           </div>}
         </section>
       </div>
