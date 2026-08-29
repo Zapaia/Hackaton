@@ -60,6 +60,25 @@ function flag(name: string) {
   return String.fromCodePoint(...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65))
 }
 
+/**
+ * A dev-server reload, a cold route or a proxy hiccup answers with an HTML page, and
+ * calling .json() on that surfaces a parser message to the user. Read the response
+ * defensively and fail with words a person can act on.
+ */
+async function readJson(response: Response) {
+  const body = await response.text()
+  try {
+    const parsed = JSON.parse(body)
+    if (!response.ok) throw new Error(parsed.error ?? `Request failed (${response.status})`)
+    return parsed
+  } catch (error: any) {
+    if (error instanceof SyntaxError) {
+      throw new Error("The service did not answer properly. Ask again.")
+    }
+    throw error
+  }
+}
+
 function MoonMark() {
   return (
     <svg className="mark" viewBox="0 0 24 24" aria-hidden="true">
@@ -128,7 +147,7 @@ export default function Mooneto() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: asked }),
     })
-      .then((res) => res.json())
+      .then(readJson)
       .then((data) => {
         if (id !== requestId.current) return
         if (data.url) setVideoUrl(data.url)
@@ -154,8 +173,7 @@ export default function Mooneto() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: asked, history, gathered }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? "request failed")
+      const data = await readJson(res)
       if (id !== requestId.current) return
       setThread((t) => t.map((x, i) => (i === turn ? { ...x, a: data } : x)))
       setLatest(data)
