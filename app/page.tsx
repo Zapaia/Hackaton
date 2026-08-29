@@ -54,10 +54,11 @@ function flag(name: string) {
 }
 
 function depictsMining(answer: Answer | null) {
-  if (!answer) return false
-  return /\b(min(e|ing)|extract(ion|ed|ing)?|resources?)\b/i.test(
-    `${answer.question} ${answer.resolved ?? ""}`
-  )
+  return answer ? depictsMiningText(`${answer.question} ${answer.resolved ?? ""}`) : false
+}
+
+function depictsMiningText(text: string) {
+  return /\b(min(e|ing)|extract(ion|ed|ing)?|resources?)\b/i.test(text)
 }
 
 type FieldStar = { left: string; top: string; size: number; delay: number }
@@ -99,7 +100,12 @@ export default function Mooneto() {
   const [starField, setStarField] = useState<FieldStar[]>(() => makeStarField("mooneto"))
   const bottom = useRef<HTMLDivElement>(null)
   const thinkingStarted = useRef(0)
-  const miningScene = depictsMining(latest)
+  const miningScene = depictsMining(latest) || depictsMiningText(activeQuestion)
+
+  function treatyPosition(index: number) {
+    const star = starField[(index * 7 + 3) % starField.length]
+    return { left: `${18 + parseFloat(star.left) * 0.64}%`, top: `${15 + parseFloat(star.top) * 0.7}%` }
+  }
 
   useEffect(() => {
     if (!exploring) return
@@ -314,12 +320,12 @@ export default function Mooneto() {
 
           {exploring && (
             <div className="exploration" aria-live="polite">
-              <MoonMark mining={miningScene} />
-              <div className="exploration-track">
-                {Array.from({ length: 6 }, (_, i) => <span className="scout-star" key={i} style={{ animationDelay: `${i * 420}ms` }}>✦</span>)}
-                <span className="scout-rocket" aria-hidden="true">🚀</span>
+              <div className="exploration-orbit">
+                <span className="orbit-ring" />
+                {starField.slice(0, 12).map((star, i) => <span className="scout-star" key={i} style={{ left: star.left, top: star.top, animationDelay: `${star.delay}ms` }}>✦</span>)}
+                <div className="exploration-moon"><MoonMark mining={miningScene} /></div>
+                <span className="journey-rocket" style={{ animationDuration: "4.8s" }} aria-hidden="true">🚀</span>
               </div>
-              <p>Reading Cala’s resource graph…</p>
               <small>{(thinkingMs / 1000).toFixed(1)}s</small>
             </div>
           )}
@@ -334,9 +340,8 @@ export default function Mooneto() {
             <div className="law-orbit">
               <span className="orbit-ring" />
               {latest.laws.map((law, i) => {
-                const angle = -90 + (i * 360) / Math.max(1, latest.laws.length)
-                const radians = (angle * Math.PI) / 180
-                return <div className="law-star" key={law} style={{ left: `${50 + Math.cos(radians) * 42}%`, top: `${50 + Math.sin(radians) * 42}%`, animationDelay: `${i * 180}ms` }}><span>✦</span><small>{law}</small></div>
+                const position = treatyPosition(i)
+                return <div className="law-star" key={law} style={{ ...position, animationDelay: `${i * 180}ms` }}><span>✦</span><small>{law}</small></div>
               })}
               <span className="journey-rocket" style={{ animationDuration: `${Math.max(4, Math.min(12, reasoningMs / 1000))}s` }} aria-hidden="true">🚀</span>
             </div>
